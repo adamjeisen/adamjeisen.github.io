@@ -183,18 +183,19 @@ keep_files:
 # Plug-ins
 plugins:
   - jekyll-archives
-  - jekyll-diagrams
+  # - jekyll-diagrams
   - jekyll-email-protect
   - jekyll-feed
   - jekyll-imagemagick
+  - jekyll-link-attributes
   - jekyll-minifier
   - jekyll-paginate-v2
+  - jekyll-redirect-from
   - jekyll/scholar
   - jekyll-sitemap
-  - jekyll-link-attributes
   - jekyll-twitter-plugin
   - jemoji
-  - jekyll-redirect-from
+
  
 
 # Sitemap settings
@@ -361,3 +362,21 @@ mdb:
 medium_zoom:
   version: "1.0.6"
   integrity: "sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM="
+mermaid:
+  integrity:
+    js: "sha256-TtLOdUA8mstPoO6sGvHIGx2ceXrrX4KgIItO06XOn8A="
+  url:
+    js: "https://cdn.jsdelivr.net/npm/mermaid@{{version}}/dist/mermaid.min.js"
+  version: "10.7.0"
+polyfill:
+  url:
+    js: "https://cdnjs.cloudflare.com/polyfill/v{{version}}/polyfill.min.js?features=es6"
+  version: "3"
+pseudocode:
+  integrity:
+    css: "sha256-VwMV//xgBPDyRFVSOshhRhzJRDyBmIACniLPpeXNUdc="
+    js: "sha256-aVkDxqyzrB+ExUsOY9PdyelkDhn/DfrjWu08aVpqNlo="
+  url:
+    css: "https://cdn.jsdelivr.net/npm/pseudocode@{{version}}/build/pseudocode.min.css"
+    js: "https://cdn.jsdelivr.net/npm/pseudocode@{{version}}/build/pseudocode.min.js"
+  version: "2.4.1"
