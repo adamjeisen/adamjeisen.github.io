@@ -11,7 +11,7 @@
 - title: Education
   type: time_table
   contents:
-    - title: PhD in Brain and Cognitive Sciences
+    - title: PhD Candidate in Brain and Cognitive Sciences
       institution: <b>Massachusetts Institute of Technology</b>, Cambridge, MA, USA
       year: Sep 2020 - Present
       advisors: Earl K. Miller and Ila R. Fiete 
@@ -26,10 +26,13 @@
 - title: Papers
   type: time_table
   contents:
+    - year: 2024
+      items:
+        - <strong>Eisen, A.J.*</strong>, Kozachkov, L.*, Bastos, A.M., Donoghue, J.A., Mahnke, M.K., Brincat, S.L., Chandra, S., Brown, E.N., Fiete, I.R., and Miller, E.K. “Propofol anesthesia destabilizes neural dynamics across cortex” <em>Neuron</em> (2024). <a href="https://www.cell.com/neuron/fulltext/S0896-6273(24)00446-X">[Link]</a>
+        - Ostrow, M., <strong>Eisen, A.J.</strong>, and Fiete, I.R. "Delay Embedding Theory of Neural Sequence Models" <em>ICML Workshop on Next Generation Sequence Models</em> (2024). <a href="https://arxiv.org/abs/2406.11993">[Link]</a>
     - year: 2023 
       items: 
         - "Ostrow, M., <strong>Eisen, A.J.</strong>, Kozachkov, L., and Fiete, I.R. \"Beyond Geometry: Comparing the Temporal Structure of Computation in Neural Circuits with Dynamical Similarity Analysis\" <em>Neural Information Processing Systems</em> (2023). <a href=\"https://neurips.cc/virtual/2023/poster/72697\">[Link]</a>" 
-        - <strong>Eisen, A.J.*</strong>, Kozachkov, L.*, Bastos, A.M., Donoghue, J.A., Mahnke, M.K., Brincat, S.L., Chandra, S., Brown, E.N., Fiete, I.R., and Miller, E.K. “Propofol anesthesia destabilizes neural dynamics across cortex” <em>bioRxiv</em> (2023). <a href="https://www.biorxiv.org/content/10.1101/2023.11.24.568595v1">[Link]</a>
     - year: 2018
       items:
         - Das, S., <strong>Eisen, A.J.</strong>, Lin, Y.H., Chan, H.S. “A lattice model of charge-pattern- dependent polyampholyte phase separation” <em>The Journal of Physical Chemistry B</em> (2018) <a href="https://pubs.acs.org/doi/full/10.1021/acs.jpcb.7b11723">[Link]</a>
@@ -145,6 +148,13 @@
 - title: Teaching and Mentoring Experience
   type: time_table
   contents:
+    - title: Application Assistance Mentor
+      year: Sep 2021 - Apr 2024
+      institution: <b>Brain and Cognitive Sciences Application Assistance Program, MIT</b>, Cambridge, MA, USA
+      description:
+      - Guided more than 15 propsective applicants to Brain and Cognitive Sciences through the application process
+      - Provided constructive feedback on statements of purpose, CVs, and other application materials
+      - Assissted applicants in identifying programs and advisors that aligned with their research interests and career goals
     - title: Mentor
       year: Sep 2023 - Dec 2023
       mentee: Nicole Wong, Undergraduate Researcher at MIT
