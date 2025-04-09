@@ -1,34 +1,43 @@
-"adams":
-  - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
-    url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
+"ostrow":
+  - firstname: ["Mitchell", "M.", "Mitchell Ostrow", "Mitchell B. Ostrow", "Mitchell B.", "Ostrow M."]
+    url: https://mitchellostrow.github.io/cv/
 
-"podolsky":
-  - firstname: ["Boris", "B.", "B. Y.", "Boris Yakovlevich"]
-    url: https://en.wikipedia.org/wiki/Boris_Podolsky
+"kozachkov":
+  - firstname: ["Leo"]
+    url: https://kozleo.github.io/
+  
+"fiete":
+  - firstname: ["Ila", "Ila R."]
+    url: https://fietelab.mit.edu/
 
-"rosen":
-  - firstname: ["Nathan", "N."]
-    url: https://en.wikipedia.org/wiki/Nathan_Rosen
+"bastos":
+  - firstname: ["Andre M.", "André", "Bastos A."]
+    url: https://www.vanderbilt.edu/psychological_sciences/bio/andr-bastos
+  
+"donoghue":
+  - firstname: ["Jacob A.", "Jacob"]
+    url: https://scholar.google.com/citations?user=4fnr6XUAAAAJ&hl=en
 
-"bach":
-  - firstname: ["Johann Sebastian", "J. S."]
-    url: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+"chandra":
+  - firstname: ["Sarthak"]
+    url: https://scholar.google.co.in/citations?user=Mx8q1rgAAAAJ&hl=en
 
-  - firstname: ["Carl Philipp Emanuel", "C. P. E."]
-    url: https://en.wikipedia.org/wiki/Carl_Philipp_Emanuel_Bach
+"brown":
+  - firstname: ["Emery N.", "Emery"]
+    url: https://www.neurostat.mit.edu/
 
-"przibram":
-  - firstname: ["Karl"]
-    url: https://link.springer.com/article/10.1007/s00016-019-00242-z
+"miller":
+  - firstname: ["Earl K.", "Earl"]
+    url: https://ekmillerlab.mit.edu/earl-miller/
 
-"schrodinger":
-  - firstname: ["Erwin"]
-    url: https://en.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger
+"das":
+  - firstname: ["Suman"]
+    url: https://scholar.google.co.in/citations?user=kLgNSysAAAAJ&hl=en
 
-"lorentz":
-  - firstname: ["Hendrik Antoon"]
-    url: https://en.wikipedia.org/wiki/Hendrik_Lorentz
+"lin":
+  - firstname: ["Yi-Hsuan"]
+    url: https://scholar.google.ca/citations?hl=en&user=Ob9KposAAAAJ&view_op=list_works
 
-"planck":
-  - firstname: ["Max"]
-    url: https://en.wikipedia.org/wiki/Max_Planck
+"chan":
+  - firstname: ["Hue Sun"]
+    url: https://biochemistry.utoronto.ca/person/hue-sun-chan/
