@@ -30,6 +30,13 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
+        },{id: "nav-albums-i-like",
+          title: "albums i like",
+          description: "Some albums that I have enjoyed listening to over the years!",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/albums/";
+          },
         },{id: "post-mapping-the-mountains-and-valleys-of-the-mind",
         
           title: "Mapping the Mountains and Valleys of the Mind",
