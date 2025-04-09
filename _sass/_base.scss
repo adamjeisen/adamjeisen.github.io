@@ -148,6 +148,13 @@ ul.task-list input[type="checkbox"] {
   vertical-align: middle;
 }
 
+.navbar-image {
+  height: 30px; /* Reduced from 40px to 30px */
+  width: auto;
+  max-width: 100%;
+  margin-right: 10px; /* Reduced from 20px to 10px */
+}
+
 // Math
 
 .equation {
