@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: null
 permalink: /redirect-the-last-samurai/
 ---
@@ -17,4 +17,4 @@ permalink: /redirect-the-last-samurai/
 <body>
     <p>Redirecting to <a href="https://soundcloud.com/adamjeisen/blossoms">Soundcloud.com</a>...</p>
 </body>
-</html>
+</html> -->
