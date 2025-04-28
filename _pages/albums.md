@@ -49,7 +49,7 @@ description: Some albums that I have enjoyed listening to over the years!
   {% for album_hash in sorted_albums %}
     {% assign album = album_hash[2] %}
     <div class="album-card" onclick="showEmbed('{{ album.SpotifyUrl }}')">
-      {% assign image_filename = album.Artist | append: ' - ' | append: album.Album | replace: ':', '_' | replace: '?', '' | replace: "'", '' | replace: '.', '' | replace: '%', '' | replace: '•', '' | replace: '/', '_' | downcase %}
+      {% assign image_filename = album.Artist | append: ' - ' | append: album.Album | replace: ':', '_' | replace: '?', '' | replace: "'", '' | replace: '.', '' | replace: '%', '' | replace: '•', '' | replace: '/', '_' %}
       <img src="/assets/img/albums I like/{{ image_filename }}.jpg" onerror="this.onerror=null; this.src='/assets/img/albums I like/{{ image_filename }}.png'" alt="{{ album.Album }} album cover" class="album-cover">
       <div class="album-info">
         <h3>{{ album.Album }}</h3>
