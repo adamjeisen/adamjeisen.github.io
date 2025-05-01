@@ -32,7 +32,7 @@ ninja.data = [{
           },
         },{id: "nav-albums-i-like",
           title: "albums i like",
-          description: "Some albums that I have enjoyed listening to over the years!",
+          description: "some albums that I have enjoyed listening to over the years!",
           section: "Navigation",
           handler: () => {
             window.location.href = "/albums/";
