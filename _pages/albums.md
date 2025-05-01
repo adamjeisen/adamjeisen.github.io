@@ -4,7 +4,7 @@ title: albums i like
 permalink: /albums/
 nav: true
 nav_order: 6
-description: Some albums that I have enjoyed listening to over the years!
+description: some albums that I have enjoyed listening to over the years!
 ---
 
 <style>
@@ -27,7 +27,7 @@ description: Some albums that I have enjoyed listening to over the years!
 <div class="custom-header">
   <div class="header-text">
     <h1>albums i like</h1>
-    <p class="page-description">Some albums that I have enjoyed listening to over the years!</p>
+    <p class="page-description">some albums that I have enjoyed listening to over the years! (current list count: {{ site.data.albumsilike | size }})</p>
   </div>
   <button class="shuffle-button" onclick="shuffleAlbums()" aria-label="Shuffle Albums">
     <img src="/assets/img/shuffle-light.png" alt="Shuffle" class="shuffle-icon light-mode-only">
