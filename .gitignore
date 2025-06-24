@@ -1,4 +1,5 @@
 _site
+scripts/set_client_id_and_secret.sh
 .bundle
 .sass-cache
 .jekyll-cache
