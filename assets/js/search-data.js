@@ -70,8 +70,11 @@ ninja.data = [{
           section: "News",},{id: "news-had-a-blast-chatting-about-consciousness-with-the-rubina-veerakone-from-the-mcgovern-institute-team-check-out-the-article-what-is-consciousness-here",
           title: 'Had a blast chatting about consciousness with the Rubina Veerakone from the McGovern...',
           description: "",
-          section: "News",},{id: "news-very-excited-that-our-paper-is-out-today-in-neuron-huge-thanks-to-my-co-first-author-leo-kozachkov-co-advisors-earl-miller-and-fiete-as-well-as-all-of-our-wonderful-co-authors-very-grateful-to-have-worked-with-everyone-on-this-project-give-it-a-read-here",
-          title: 'Very excited that our paper is out today in Neuron ! Huge thanks...',
+          section: "News",},{id: "news-very-excited-that-our-paper-on-dynamic-stability-in-propofol-is-out-today-in-neuron-huge-thanks-to-my-co-first-author-leo-kozachkov-co-advisors-earl-miller-and-fiete-as-well-as-all-of-our-wonderful-co-authors-give-it-a-read-here",
+          title: 'Very excited that our paper on dynamic stability in propofol is out today...',
+          description: "",
+          section: "News",},{id: "news-our-paper-on-characterizing-control-between-interacting-subsystems-with-deep-jacobian-estimation-was-accepted-as-a-spotlight-to-neurips-2025-very-grateful-to-have-worked-with-such-an-amazing-team-on-this-one-check-it-out-here",
+          title: 'Our paper on characterizing control between interacting subsystems with deep Jacobian estimation was...',
           description: "",
           section: "News",},{id: "projects-project-1",
           title: 'project 1',
@@ -123,35 +126,28 @@ ninja.data = [{
         title: 'email',
         section: 'Socials',
         handler: () => {
-          window.open("mailto:%79%6F%75@%65%78%61%6D%70%6C%65.%63%6F%6D", "_blank");
+          window.open("mailto:%65%69%73%65%6E%61%6A@%6D%69%74.%65%64%75", "_blank");
         },
       },{
-        id: 'social-inspire',
-        title: 'Inspire HEP',
+        id: 'social-github',
+        title: 'GitHub',
         section: 'Socials',
         handler: () => {
-          window.open("https://inspirehep.net/authors/1010907", "_blank");
-        },
-      },{
-        id: 'social-rss',
-        title: 'RSS Feed',
-        section: 'Socials',
-        handler: () => {
-          window.open("/feed.xml", "_blank");
+          window.open("https://github.com/adamjeisen# your GitHub user name", "_blank");
         },
       },{
         id: 'social-scholar',
         title: 'Google Scholar',
         section: 'Socials',
         handler: () => {
-          window.open("https://scholar.google.com/citations?user=qc6CJjYAAAAJ", "_blank");
+          window.open("https://scholar.google.com/citations?user=pEJ4yfIAAAAJ", "_blank");
         },
       },{
-        id: 'social-custom_social',
-        title: 'Custom_social',
+        id: 'social-spotify',
+        title: 'Spotify',
         section: 'Socials',
         handler: () => {
-          window.open("https://www.alberteinstein.com/", "_blank");
+          window.open("https://open.spotify.com/user/adameisen1", "_blank");
         },
       },{
       id: 'light-theme',
