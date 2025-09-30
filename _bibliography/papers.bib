@@ -1,6 +1,18 @@
 ---
 ---
 
+@inproceedings{Eisen2025-tu,
+  title         = "Characterizing control between interacting subsystems with
+                   deep Jacobian estimation",
+  author        = "Eisen, Adam J. and Ostrow, Mitchell and Chandra, Sarthak and
+                   Kozachkov, Leo and Miller, Earl K and Fiete, Ila R",
+  booktitle     = {Advances in Neural Information Processing Systems (NeurIPS)},
+  abstract      = "Biological function arises through the dynamical interactions of multiple subsys- tems, including those between brain areas, within gene regulatory networks, and more.  A common approach to understanding these systems is to model the dy- namics of each subsystem and characterize communication between them.  An alternative approach is through the lens of control theory:  how the subsystems control one another. This approach involves inferring the directionality, strength, and contextual modulation of control between subsystems.  However, methods for understanding subsystem control are typically linear and cannot adequately describe the rich contextual effects enabled by nonlinear complex systems.  To bridge this gap, we devise a data-driven nonlinear control-theoretic framework to characterize subsystem interactions via the Jacobian of the dynamics. We ad- dress the challenge of learning Jacobians from time-series data by proposing the JacobianODE, a deep learning method that leverages properties of the Jacobian to directly estimate it for arbitrary dynamical systems from data alone. We show that JacobianODEs outperform existing Jacobian estimation methods on challenging systems, including high-dimensional chaos. Applying our approach to a multi-area recurrent neural network (RNN) trained on a working memory selection task, we show that the “sensory” area gains greater control over the “cognitive” area over learning. Furthermore, we leverage the JacobianODE to directly control the trained RNN, enabling precise manipulation of its behavior. Our work lays the foundation for a theoretically grounded and data-driven understanding of interactions among biological subsystems.",
+  year          =  2025,
+  selected={true},
+  preview       = {area-control.png},
+}
+
 
 @ARTICLE{Eisen2024-vc,
   title    = "Propofol anesthesia destabilizes neural dynamics across cortex",
@@ -76,7 +88,7 @@
 
 @inproceedings{NEURIPS2023_6ac807c9,
  author={Mitchell B. Ostrow and Adam J. Eisen and Leo Kozachkov and Ila R. Fiete},
- booktitle = {Advances in Neural Information Processing Systems},
+ booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
  editor = {A. Oh and T. Naumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
  pages = {33824--33837},
  publisher = {Curran Associates, Inc.},
