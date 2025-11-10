@@ -5,7 +5,8 @@ layout: null
 permalink: /cv/
 nav_order: 5
 # cv_pdf: CV_2024-06-22.pdf
-cv_pdf: Resume_2025_09_25.pdf
+# cv_pdf: Resume_2025_09_25.pdf
+cv_pdf: Adam_J_Eisen_Resume_10_11_2025.pdf
 # layout: cv
 # permalink: /cv/
 
