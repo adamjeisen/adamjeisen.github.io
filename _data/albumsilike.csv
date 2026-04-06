@@ -1,3 +1,4 @@
+# To manage albums, run: python scripts/admin_server.py
 Artist,Album,Genre,Year,SpotifyUrl
 Adrianne Lenker,abysskiss,Folk,2018,https://open.spotify.com/album/1Bff8eaWt2o058OQIq2OPa?si=cyPRwYdFRTW76UdYwrCS6g
 Adrianne Lenker,Bright Future,Folk,2024,https://open.spotify.com/album/2Y8WS7iDIZkvzB5GUeLvku?si=597aea2c4a7a45c8
@@ -325,3 +326,5 @@ Yussef Dayes,Black Classical Music,Jazz,2023,https://open.spotify.com/album/5uw3
 Zac Brown Band,The Foundation,Country,2008,https://open.spotify.com/album/08XFx1OZMZnRCh0JrKTIgT
 Zac Brown Band,Uncaged,Country,2012,https://open.spotify.com/album/1s8rmXFgIuXVpUach3s2V7
 Zac Brown Band,You Get What You Give,Country,2010,https://open.spotify.com/album/7xnimikDuIBDpLeLrjptb8
+Lily Allen,West End Girl,Pop,2025,https://open.spotify.com/album/4Dn3Z14YfT2gQVDgLmWUVn?si=XVtxZEx1TAKqvDBjTG0heQ
+Madison Cunningham,Ace,Folk,2025,https://open.spotify.com/album/1A8y28WkLlz79cpf843cWV?si=r_pD8E3HStS3SyGc8y2BAw

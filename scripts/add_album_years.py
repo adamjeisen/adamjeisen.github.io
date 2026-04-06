@@ -4,6 +4,9 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import time
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Get Spotify API credentials from environment variables
 CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
