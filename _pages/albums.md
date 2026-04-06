@@ -1,6 +1,6 @@
 ---
 layout: page
-title: albums i like
+title: albums I like
 permalink: /albums/
 nav: true
 nav_order: 6
@@ -31,16 +31,16 @@ description: some albums that I have enjoyed listening to over the years!
   </div>
   <div class="header-controls">
     <div class="sort-controls">
-      <label for="sort-select" class="sort-label">Sort by:</label>
-      <select id="sort-select" class="sort-select" onchange="sortAlbums()">
-        <option value="artist">Artist</option>
-        <option value="album">Album</option>
-        <option value="year">Year</option>
-      </select>
+      <span class="sort-text-group">
+        <label for="sort-select" class="sort-label">Sort by:</label>
+        <select id="sort-select" class="sort-select" onchange="sortAlbums()">
+          <option value="year">Year</option>
+          <option value="artist">Artist</option>
+          <option value="album">Album</option>
+        </select>
+      </span>
       <button id="sort-direction" class="sort-direction-btn" onclick="toggleSortDirection()" aria-label="Toggle sort direction" title="Toggle ascending/descending">
-        <svg class="sort-direction-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span id="sort-dir-label">&#8595;</span>
       </button>
     </div>
     <button class="shuffle-button" onclick="shuffleAlbums()" aria-label="Shuffle Albums">
@@ -110,118 +110,68 @@ description: some albums that I have enjoyed listening to over the years!
 }
 
 .sort-controls {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   background: var(--global-card-bg-color);
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--global-divider-color);
+  transition: border-color 0.2s;
 }
 
 .sort-controls:hover {
   border-color: var(--global-text-color-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .sort-controls:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.sort-text-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sort-label,
+.sort-select {
+  font-size: 0.85rem;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: inherit;
 }
 
 .sort-label {
   color: var(--global-text-color-light);
-  font-size: 0.85rem;
   font-weight: 500;
   white-space: nowrap;
-  letter-spacing: 0.3px;
-  display: flex;
-  align-items: center;
-  height: 100%;
 }
 
 .sort-select {
   background: transparent;
   color: var(--global-text-color);
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 1.75rem 0.4rem 0.6rem;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  min-width: 100px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-[data-theme="dark"] .sort-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-}
-
-.sort-select:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] .sort-select:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.sort-select:focus {
   outline: none;
-  background-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 0 0 2px var(--global-theme-color);
-}
-
-[data-theme="dark"] .sort-select:focus {
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .sort-direction-btn {
   background: transparent;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem;
+  border: 1px solid var(--global-divider-color);
+  border-radius: 5px;
+  padding: 0.25rem 0.45rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: color 0.15s, border-color 0.15s;
   color: var(--global-text-color-light);
-  height: 100%;
-  min-width: 28px;
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 .sort-direction-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
   color: var(--global-text-color);
-}
-
-[data-theme="dark"] .sort-direction-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.sort-direction-btn:focus {
-  outline: none;
-  background-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 0 0 2px var(--global-theme-color);
-}
-
-[data-theme="dark"] .sort-direction-btn:focus {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.sort-direction-icon {
-  transition: transform 0.2s ease;
-}
-
-.sort-direction-btn[data-direction="desc"] .sort-direction-icon {
-  transform: rotate(180deg);
+  border-color: var(--global-text-color-light);
 }
 
 .shuffle-button {
@@ -461,23 +411,13 @@ description: some albums that I have enjoyed listening to over the years!
     flex-wrap: wrap;
   }
   .sort-controls {
-    flex: 1;
-    min-width: 0;
-    padding: 0.4rem 0.75rem;
-    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
   }
   .sort-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
   .sort-select {
-    flex: 1;
-    min-width: 80px;
-    font-size: 0.85rem;
-    padding: 0.35rem 1.5rem 0.35rem 0.5rem;
-  }
-  .sort-direction-btn {
-    min-width: 24px;
-    padding: 0.35rem;
+    font-size: 0.82rem;
   }
 }
 
@@ -526,6 +466,7 @@ function toggleSortDirection() {
   const currentDir = getSortDirection();
   const newDir = currentDir === 'asc' ? 'desc' : 'asc';
   btn.setAttribute('data-direction', newDir);
+  document.getElementById('sort-dir-label').innerHTML = newDir === 'desc' ? '&#8595;' : '&#8593;';
   sortAlbums();
 }
 
@@ -616,11 +557,11 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
-// Initialize sorting on page load (default to artist, ascending)
+// Initialize sorting on page load (default to year, descending)
 document.addEventListener('DOMContentLoaded', function() {
   const sortDirBtn = document.getElementById('sort-direction');
   if (sortDirBtn && !sortDirBtn.getAttribute('data-direction')) {
-    sortDirBtn.setAttribute('data-direction', 'asc');
+    sortDirBtn.setAttribute('data-direction', 'desc');
   }
   sortAlbums();
 });
