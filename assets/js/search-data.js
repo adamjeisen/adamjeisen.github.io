@@ -31,11 +31,18 @@ ninja.data = [{
             window.location.href = "/cv/";
           },
         },{id: "nav-albums-i-like",
-          title: "albums i like",
+          title: "albums I like",
           description: "some albums that I have enjoyed listening to over the years!",
           section: "Navigation",
           handler: () => {
             window.location.href = "/albums/";
+          },
+        },{id: "nav-things-i-felt",
+          title: "things I felt",
+          description: "my attempts to visually capture my experiences",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/things-i-felt/";
           },
         },{id: "post-mapping-the-mountains-and-valleys-of-the-mind",
         
