@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Admin Server — Albums + Photo Journal ("Things I Saw")
+Admin Server — Albums + Photo Journal ("Feelings")
 Run from repo root: python scripts/admin_server.py
   Albums admin:  http://localhost:5001/
   Photos admin:  http://localhost:5001/photos
@@ -34,7 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = REPO_ROOT / "_data" / "albumsilike.csv"
 COVERS_DIR = REPO_ROOT / "assets" / "img" / "albums I like"
 CSV_FIELDS = ["Artist", "Album", "Genre", "Year", "SpotifyUrl"]
-THINGS_I_SAW_PATH = REPO_ROOT / "_data" / "things_i_saw.json"
+THINGS_I_SAW_PATH = REPO_ROOT / "_data" / "feelings.json"
 
 # ---------------------------------------------------------------------------
 # Spotify client (optional — photo admin works without it)
@@ -160,11 +160,11 @@ def download_cover(cover_url: str, artist: str, album: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Things I Saw helpers
+# Feelings helpers
 # ---------------------------------------------------------------------------
 
 def read_tis_json() -> list:
-    """Read things_i_saw.json; return [] if file doesn't exist yet."""
+    """Read feelings.json; return [] if file doesn't exist yet."""
     if not THINGS_I_SAW_PATH.exists():
         return []
     with open(THINGS_I_SAW_PATH, "r", encoding="utf-8") as f:
@@ -172,7 +172,7 @@ def read_tis_json() -> list:
 
 
 def write_tis_json(data: list) -> None:
-    """Write things_i_saw.json atomically."""
+    """Write feelings.json atomically."""
     tmp = THINGS_I_SAW_PATH.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     os.replace(tmp, THINGS_I_SAW_PATH)
@@ -669,7 +669,7 @@ loadAlbums();
 
 
 # ---------------------------------------------------------------------------
-# Things I Saw — API routes
+# Feelings — API routes
 # ---------------------------------------------------------------------------
 
 @app.route("/api/photos/months", methods=["GET"])
@@ -691,7 +691,8 @@ def tis_create_month():
     if find_month_index(data, month_id) != -1:
         return jsonify({"error": f"Month '{month_id}' already exists"}), 409
 
-    data.insert(0, {"id": month_id, "month_label": month_label, "description": description, "playlist_url": playlist_url, "events": []})
+    data.append({"id": month_id, "month_label": month_label, "description": description, "playlist_url": playlist_url, "events": []})
+    data.sort(key=lambda m: m["id"], reverse=True)
     write_tis_json(data)
     return jsonify({"ok": True})
 
@@ -851,9 +852,9 @@ def tis_upload_photo(month_id, event_id):
     }
     data[idx]["events"][eidx]["photos"].append(photo)
 
-    # Sort photos by date_taken within the event
+    # Sort photos by date_taken descending (most recent first) within the event
     data[idx]["events"][eidx]["photos"].sort(
-        key=lambda p: p.get("date_taken") or "9999"
+        key=lambda p: p.get("date_taken") or "", reverse=True
     )
 
     write_tis_json(data)
@@ -959,7 +960,7 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photos Admin — Things I Saw</title>
+<title>Photos Admin — Feelings</title>
 <style>
   :root {
     --bg: #0f0f0f; --bg-raised: #141414; --bg-card: #1a1a1a;
@@ -1092,7 +1093,7 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
 <body>
 
 <header>
-  <h1>&#128247; Things I Saw — Admin</h1>
+  <h1>&#128247; Feelings — Admin</h1>
   <nav>
     <a href="/">&#9835; Albums</a>
     <a href="/photos" class="active">&#128247; Photos</a>

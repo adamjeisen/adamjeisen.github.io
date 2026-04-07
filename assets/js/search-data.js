@@ -37,12 +37,12 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/albums/";
           },
-        },{id: "nav-things-i-felt",
-          title: "things I felt",
-          description: "my attempts to visually capture my experiences",
+        },{id: "nav-feelings",
+          title: "feelings",
+          description: "my attempts to visually and sonically capture my feelings &amp; experiences",
           section: "Navigation",
           handler: () => {
-            window.location.href = "/things-i-felt/";
+            window.location.href = "/feelings/";
           },
         },{id: "post-mapping-the-mountains-and-valleys-of-the-mind",
         

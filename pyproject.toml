@@ -8,4 +8,5 @@ dependencies = [
     "python-dotenv",
     "requests",
     "spotipy",
+    "cloudinary",
 ]
