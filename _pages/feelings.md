@@ -210,7 +210,7 @@ description: my attempts to visually and sonically capture my feelings & experie
 
 <div class="tis-page-header">
   <h1>feelings</h1>
-  <p class="tis-page-desc">my attempts to visually capture my feelings & experiences &mdash; {{ total_photos }} photos across {{ site.data.feelings | size }} months</p>
+  <p class="tis-page-desc">my attempts to visually and sonically capture my feelings & experiences &mdash; {{ total_photos }} photos across {{ site.data.feelings | size }} months</p>
 </div>
 
 {% if site.data.feelings.size > 3 %}
