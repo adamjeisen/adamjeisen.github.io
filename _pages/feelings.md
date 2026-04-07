@@ -1,10 +1,10 @@
 ---
 layout: page
-title: things I felt
-permalink: /things-i-felt/
+title: feelings
+permalink: /feelings/
 nav: true
 nav_order: 7
-description: my attempts to visually capture my experiences
+description: my attempts to visually and sonically capture my feelings & experiences
 ---
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.min.css">
@@ -198,7 +198,7 @@ description: my attempts to visually capture my experiences
 </style>
 
 {% assign total_photos = 0 %}
-{% for month in site.data.things_i_saw %}
+{% for month in site.data.feelings %}
   {% for event in month.events %}
     {% for photo in event.photos %}
       {% unless photo.hidden %}
@@ -209,19 +209,19 @@ description: my attempts to visually capture my experiences
 {% endfor %}
 
 <div class="tis-page-header">
-  <h1>things I felt</h1>
-  <p class="tis-page-desc">my attempts to visually capture my experiences &mdash; {{ total_photos }} photos across {{ site.data.things_i_saw | size }} months</p>
+  <h1>feelings</h1>
+  <p class="tis-page-desc">my attempts to visually capture my feelings & experiences &mdash; {{ total_photos }} photos across {{ site.data.feelings | size }} months</p>
 </div>
 
-{% if site.data.things_i_saw.size > 3 %}
+{% if site.data.feelings.size > 3 %}
 <nav class="tis-jump-nav" aria-label="Jump to month">
-  {% for month in site.data.things_i_saw %}
+  {% for month in site.data.feelings %}
     <a href="#{{ month.id }}">{{ month.month_label }}</a>
   {% endfor %}
 </nav>
 {% endif %}
 
-{% for month in site.data.things_i_saw %}
+{% for month in site.data.feelings %}
 <section class="tis-month" id="{{ month.id }}">
   <div class="tis-month-header">
     <h2 class="tis-month-label">{{ month.month_label }}</h2>

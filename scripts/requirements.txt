@@ -1,3 +1,5 @@
 requests==2.31.0
 spotipy==2.23.0
-python-dotenv==1.0.0  # Optional: for .env file support 
+python-dotenv==1.0.0  # Optional: for .env file support
+cloudinary==1.36.0
+flask==3.0.0

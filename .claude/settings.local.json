@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"nav_order\\\\|nav:\" /Users/adameisen/Documents/Repos/personal-website/adamjeisen.github.io/_pages/*.md)",
+      "Bash(grep -n \"nav_order\" /Users/adameisen/Documents/Repos/personal-website/adamjeisen.github.io/_pages/*.md)",
+      "Bash(uv --version)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
