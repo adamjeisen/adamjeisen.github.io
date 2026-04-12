@@ -6,6 +6,7 @@ Run from repo root: python scripts/admin_server.py
   Photos admin:  http://localhost:5001/photos
 """
 
+import hashlib
 import io
 import json
 import os
@@ -23,6 +24,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 
 import cloudinary
+import cloudinary.api
 import cloudinary.uploader
 
 load_dotenv()
@@ -820,15 +822,30 @@ def tis_upload_photo(month_id, event_id):
     file = request.files["file"]
     caption = (request.form.get("caption") or "").strip()
 
+    # Upload to Cloudinary first to get the canonical etag hash
+    file_bytes = file.read()
     try:
         result = cloudinary.uploader.upload(
-            file.read(),
+            file_bytes,
             folder="things-i-saw",
             resource_type="image",
             image_metadata=True,
         )
     except Exception as e:
         return jsonify({"error": f"Cloudinary upload failed: {e}"}), 500
+
+    file_hash = result.get("etag", "") or hashlib.md5(file_bytes).hexdigest()
+
+    # Check for duplicates across all months/events
+    for m in data:
+        for ev in m.get("events", []):
+            for p in ev.get("photos", []):
+                if p.get("hash") == file_hash:
+                    # Already uploaded to Cloudinary, so clean it up
+                    cloudinary_delete(result["secure_url"])
+                    return jsonify({
+                        "error": f"Duplicate photo — already exists in \"{m.get('month_label', m['id'])}\" / \"{ev.get('title') or ev['id']}\""
+                    }), 409
 
     width = result.get("width", 0)
     height = result.get("height", 0)
@@ -849,6 +866,7 @@ def tis_upload_photo(month_id, event_id):
         "height": height,
         "orientation": orientation,
         "date_taken": date_taken,
+        "hash": file_hash,
     }
     data[idx]["events"][eidx]["photos"].append(photo)
 
@@ -923,6 +941,102 @@ def tis_reorder_photos(month_id, event_id):
     photos.insert(to_idx, photo)
     write_tis_json(data)
     return jsonify({"ok": True})
+
+
+@app.route("/api/photos/backfill-hashes", methods=["POST"])
+def tis_backfill_hashes():
+    """Backfill MD5 hashes for existing photos using Cloudinary's etag."""
+    if not CLOUDINARY_CLOUD_NAME:
+        return jsonify({"error": "Cloudinary not configured"}), 503
+
+    data = read_tis_json()
+    updated = 0
+    errors = 0
+
+    for month in data:
+        for event in month.get("events", []):
+            for photo in event.get("photos", []):
+                if photo.get("hash"):
+                    continue
+                public_id = cloudinary_public_id(photo.get("url", ""))
+                if not public_id:
+                    errors += 1
+                    continue
+                try:
+                    info = cloudinary.api.resource(public_id, resource_type="image")
+                    photo["hash"] = info.get("etag", "")
+                    if photo["hash"]:
+                        updated += 1
+                    else:
+                        errors += 1
+                except Exception as e:
+                    print(f"Warning: could not get etag for {public_id}: {e}")
+                    errors += 1
+
+    write_tis_json(data)
+    return jsonify({"ok": True, "updated": updated, "errors": errors})
+
+
+@app.route("/api/photos/bulk-action", methods=["POST"])
+def tis_bulk_action():
+    """Bulk actions on multiple photos: hide, unhide, delete, move."""
+    body = request.json or {}
+    action = body.get("action")  # "hide", "unhide", "delete", "move"
+    photos = body.get("photos", [])  # [{month_id, event_id, photo_idx}, ...]
+    dst_event_id = body.get("dst_event_id", "")  # only for "move"
+
+    if action not in ("hide", "unhide", "delete", "move"):
+        return jsonify({"error": "Invalid action"}), 400
+    if not photos:
+        return jsonify({"error": "No photos selected"}), 400
+    if action == "move" and not dst_event_id:
+        return jsonify({"error": "dst_event_id is required for move"}), 400
+
+    data = read_tis_json()
+
+    # Process in reverse-index order so that popping doesn't shift later indices
+    # Group by month+event, sort by photo_idx descending
+    photos_sorted = sorted(photos, key=lambda p: (p["month_id"], p["event_id"], -p["photo_idx"]))
+
+    moved = []
+    count = 0
+    for sel in photos_sorted:
+        midx = find_month_index(data, sel["month_id"])
+        if midx == -1:
+            continue
+        eidx = find_event_index(data[midx], sel["event_id"])
+        if eidx == -1:
+            continue
+        photo_list = data[midx]["events"][eidx]["photos"]
+        pi = sel["photo_idx"]
+        if pi < 0 or pi >= len(photo_list):
+            continue
+
+        if action == "hide":
+            photo_list[pi]["hidden"] = True
+            count += 1
+        elif action == "unhide":
+            photo_list[pi]["hidden"] = False
+            count += 1
+        elif action == "delete":
+            cloudinary_delete(photo_list[pi].get("url", ""))
+            photo_list.pop(pi)
+            count += 1
+        elif action == "move":
+            photo = photo_list.pop(pi)
+            moved.append((midx, photo))
+            count += 1
+
+    if action == "move" and moved:
+        # All selected photos go to dst_event within the same month as each photo
+        for midx, photo in moved:
+            dst_eidx = find_event_index(data[midx], dst_event_id)
+            if dst_eidx == -1:
+                continue
+            data[midx]["events"][dst_eidx]["photos"].append(photo)
+
+    write_tis_json(data)
+    return jsonify({"ok": True, "count": count})
 
 
 @app.route("/api/photos/months/<month_id>/move-photo", methods=["POST"])
@@ -1072,6 +1186,24 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
   .photo-card.dragging { opacity: 0.4; }
   .event-card-body.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; border-radius: 8px; }
 
+  /* Multi-select */
+  .photo-card .select-check { position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; background: var(--overlay); border: 2px solid rgba(255,255,255,0.5); border-radius: 4px; cursor: pointer; z-index: 2; opacity: 0; transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; }
+  .photo-card:hover .select-check, .photo-card.selected .select-check { opacity: 1; }
+  .photo-card.selected .select-check { background: var(--accent); border-color: var(--accent); }
+  .photo-card.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .photo-card.selected .photo-idx-badge { display: none; }
+
+  /* Bulk action bar */
+  .bulk-bar { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-raised); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; z-index: 998; box-shadow: 0 4px 20px rgba(0,0,0,0.4); align-items: center; gap: 10px; }
+  .bulk-bar.visible { display: flex; }
+  .bulk-bar .bulk-count { font-size: 0.82rem; color: var(--text); font-weight: 600; white-space: nowrap; }
+  .bulk-bar button { background: transparent; border: 1px solid var(--border); border-radius: 5px; padding: 5px 12px; color: var(--text-muted); font-size: 0.78rem; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .bulk-bar button:hover { color: var(--text); border-color: var(--text-faint); }
+  .bulk-bar button.danger { color: var(--error); border-color: var(--error); }
+  .bulk-bar button.danger:hover { background: var(--error); color: #fff; }
+  .bulk-bar select { background: var(--input-bg); border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; color: var(--text); font-size: 0.78rem; outline: none; }
+  .bulk-bar .bulk-close { background: transparent; border: none; color: var(--text-faint); font-size: 1rem; cursor: pointer; padding: 2px 6px; }
+
   /* Upload zone (compact, per-event) */
   .event-upload { border: 1px dashed var(--border); border-radius: 6px; padding: 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
   .event-upload:hover, .event-upload.drag-over { border-color: var(--accent); background: var(--upload-hover-bg); }
@@ -1103,6 +1235,16 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
 
 <div id="status"></div>
 
+<div class="bulk-bar" id="bulk-bar">
+  <span class="bulk-count" id="bulk-count">0 selected</span>
+  <button onclick="bulkAction('hide')">Hide</button>
+  <button onclick="bulkAction('unhide')">Unhide</button>
+  <select id="bulk-move-target"><option value="">Move to event...</option></select>
+  <button onclick="bulkMove()">Move</button>
+  <button class="danger" onclick="bulkAction('delete')">Delete</button>
+  <button class="bulk-close" onclick="clearSelection()">&#10005;</button>
+</div>
+
 <div class="layout">
 
   <!-- Left: month list -->
@@ -1115,6 +1257,7 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
         <textarea id="new-desc" rows="2" placeholder="Description (optional)"></textarea>
         <input id="new-playlist" type="text" placeholder="Playlist URL (optional)">
         <button class="btn-primary" onclick="createMonth()">+ New Month</button>
+        <button class="btn-sm" style="margin-top:4px;width:100%" onclick="backfillHashes()">Backfill photo hashes</button>
       </div>
     </div>
     <div class="months-list" id="months-list"></div>
@@ -1175,6 +1318,8 @@ function renderMonthList() {
   if (!months.length) { el.innerHTML = '<div class="empty-state">No months yet.</div>'; return; }
   el.innerHTML = months.map(m => {
     const photoCount = m.events.reduce((s, e) => s + e.photos.length, 0);
+    const hiddenCount = m.events.reduce((s, e) => s + e.photos.filter(p => p.hidden).length, 0);
+    const hiddenInfo = hiddenCount > 0 ? ` · ${hiddenCount} hidden` : '';
     return `
       <div class="month-row ${m.id === selectedMonthId ? 'active' : ''}"
            data-month-id="${escHtml(m.id)}"
@@ -1188,7 +1333,7 @@ function renderMonthList() {
         <span class="drag-handle" ondragstart="event.stopPropagation()" onclick="event.stopPropagation()">⠿</span>
         <div style="flex:1;min-width:0">
           <div class="month-row-label">${escHtml(m.month_label)}</div>
-          <div class="month-row-count">${m.events.length} event${m.events.length !== 1 ? 's' : ''} · ${photoCount} photo${photoCount !== 1 ? 's' : ''}</div>
+          <div class="month-row-count">${m.events.length} event${m.events.length !== 1 ? 's' : ''} · ${photoCount} photo${photoCount !== 1 ? 's' : ''}${hiddenInfo}</div>
         </div>
         <button class="icon-btn" onclick="event.stopPropagation(); deleteMonth('${escJs(m.id)}', '${escJs(m.month_label)}')">&#10005;</button>
       </div>`;
@@ -1264,10 +1409,13 @@ function photoCardHtml(monthId, eventId, photo, idx, total) {
   const dateStr = photo.date_taken ? `<span class="photo-date">${escHtml(photo.date_taken)}</span>` : '';
   const isHidden = photo.hidden;
   const hideLabel = isHidden ? 'Show' : 'Hide';
+  const selKey = `${monthId}|${eventId}|${idx}`;
+  const isSel = selectedPhotos.has(selKey);
   return `
-    <div class="photo-card ${isHidden ? 'is-hidden' : ''}" draggable="true"
+    <div class="photo-card ${isHidden ? 'is-hidden' : ''} ${isSel ? 'selected' : ''}" draggable="true"
          ondragstart="onPhotoDragStart(event, '${escJs(monthId)}', '${escJs(eventId)}', ${idx})"
          ondragend="onPhotoDragEnd(event)">
+      <div class="select-check" onclick="event.stopPropagation(); toggleSelect('${escJs(monthId)}', '${escJs(eventId)}', ${idx}, event)">${isSel ? '&#10003;' : ''}</div>
       <span class="photo-idx-badge">${idx + 1}</span>
       <span class="photo-hidden-badge">Hidden</span>
       <img src="${escHtml(thumb)}" loading="lazy">
@@ -1321,6 +1469,20 @@ async function createMonth() {
   showStatus(`Created "${label}"`, 'success');
   await loadMonths();
   selectMonth(id);
+}
+
+async function backfillHashes() {
+  if (!confirm('Fetch hashes from Cloudinary for all photos missing a hash?')) return;
+  showStatus('Backfilling hashes — this may take a moment...', 'success');
+  try {
+    const res = await fetch('/api/photos/backfill-hashes', {method: 'POST'});
+    const d = await res.json();
+    if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+    showStatus(`Backfill complete: ${d.updated} updated, ${d.errors} errors`, 'success');
+    await loadMonths();
+  } catch (e) {
+    showStatus('Network error: ' + e.message, 'error');
+  }
 }
 
 async function deleteMonth(id, label) {
@@ -1454,6 +1616,109 @@ async function movePhoto(monthId, eventId, fromIdx, toIdx) {
   const d = await res.json();
   if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
   await loadMonths();
+}
+
+// ---- Multi-select ----
+const selectedPhotos = new Set();  // keys: "monthId|eventId|photoIdx"
+let lastClickedKey = null;
+
+function toggleSelect(monthId, eventId, idx, e) {
+  const key = `${monthId}|${eventId}|${idx}`;
+
+  if (e && e.shiftKey && lastClickedKey && lastClickedKey !== key) {
+    // Shift-click: select range within same event
+    const [lm, le, li] = lastClickedKey.split('|');
+    if (lm === monthId && le === eventId) {
+      const from = Math.min(parseInt(li), idx);
+      const to = Math.max(parseInt(li), idx);
+      for (let i = from; i <= to; i++) {
+        selectedPhotos.add(`${monthId}|${eventId}|${i}`);
+      }
+    } else {
+      selectedPhotos.has(key) ? selectedPhotos.delete(key) : selectedPhotos.add(key);
+    }
+  } else {
+    selectedPhotos.has(key) ? selectedPhotos.delete(key) : selectedPhotos.add(key);
+  }
+
+  lastClickedKey = key;
+  updateBulkBar();
+  renderEvents(selectedMonthId);
+}
+
+function clearSelection() {
+  selectedPhotos.clear();
+  lastClickedKey = null;
+  updateBulkBar();
+  renderEvents(selectedMonthId);
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const count = selectedPhotos.size;
+  if (count === 0) {
+    bar.classList.remove('visible');
+    return;
+  }
+  bar.classList.add('visible');
+  document.getElementById('bulk-count').textContent = `${count} selected`;
+
+  // Populate move target dropdown with events from current month
+  const select = document.getElementById('bulk-move-target');
+  const month = months.find(m => m.id === selectedMonthId);
+  const opts = '<option value="">Move to event...</option>' +
+    (month ? month.events.map(e => `<option value="${escHtml(e.id)}">${escHtml(e.title || e.id)}</option>`).join('') : '');
+  select.innerHTML = opts;
+}
+
+function getSelectedPhotos() {
+  // Convert set to sorted array of {month_id, event_id, photo_idx}
+  return Array.from(selectedPhotos).map(key => {
+    const [month_id, event_id, photo_idx] = key.split('|');
+    return {month_id, event_id, photo_idx: parseInt(photo_idx)};
+  });
+}
+
+async function bulkAction(action) {
+  const items = getSelectedPhotos();
+  if (!items.length) return;
+  const label = action === 'delete' ? `Delete ${items.length} photo${items.length !== 1 ? 's' : ''} from Cloudinary?`
+    : `${action.charAt(0).toUpperCase() + action.slice(1)} ${items.length} photo${items.length !== 1 ? 's' : ''}?`;
+  if (!confirm(label)) return;
+  try {
+    const res = await fetch('/api/photos/bulk-action', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action, photos: items}),
+    });
+    const d = await res.json();
+    if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+    showStatus(`${d.count} photo${d.count !== 1 ? 's' : ''} ${action === 'delete' ? 'deleted' : action === 'hide' ? 'hidden' : 'unhidden'}`, 'success');
+    clearSelection();
+    await loadMonths();
+  } catch (e) {
+    showStatus('Error: ' + e.message, 'error');
+  }
+}
+
+async function bulkMove() {
+  const items = getSelectedPhotos();
+  if (!items.length) return;
+  const dst = document.getElementById('bulk-move-target').value;
+  if (!dst) { showStatus('Select a destination event', 'error'); return; }
+  if (!confirm(`Move ${items.length} photo${items.length !== 1 ? 's' : ''} to this event?`)) return;
+  try {
+    const res = await fetch('/api/photos/bulk-action', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action: 'move', photos: items, dst_event_id: dst}),
+    });
+    const d = await res.json();
+    if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+    showStatus(`Moved ${d.count} photo${d.count !== 1 ? 's' : ''}`, 'success');
+    clearSelection();
+    await loadMonths();
+  } catch (e) {
+    showStatus('Error: ' + e.message, 'error');
+  }
 }
 
 // ---- Drag months to reorder ----

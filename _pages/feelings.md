@@ -245,7 +245,7 @@ description: my attempts to visually and sonically capture my feelings & experie
     <div class="tis-photo-grid">
       {% for photo in event.photos %}
       {% if photo.hidden %}{% continue %}{% endif %}
-      {% assign thumb_url = photo.url | replace: '/upload/', '/upload/w_400,q_auto,f_auto/' %}
+      {% assign thumb_url = photo.url | replace: '/upload/', '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/' %}
       <a href="{{ photo.url }}"
          data-pswp-width="{{ photo.width }}"
          data-pswp-height="{{ photo.height }}"
