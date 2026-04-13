@@ -5,7 +5,9 @@
       "Bash(grep -n \"nav_order\" /Users/adameisen/Documents/Repos/personal-website/adamjeisen.github.io/_pages/*.md)",
       "Bash(uv --version)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(.venv/bin/python3 -c ':*)",
+      "Bash(../.venv/bin/python3 -c \"from admin_helpers import read_bib, write_bib, slugify; print\\('OK'\\)\")"
     ]
   }
 }

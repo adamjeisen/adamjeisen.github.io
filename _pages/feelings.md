@@ -232,7 +232,7 @@ description: my attempts to visually and sonically capture my feelings & experie
   {% if month.playlist_url and month.playlist_url != "" %}
     {% assign embed_url = month.playlist_url | replace: 'https://open.spotify.com/', 'https://open.spotify.com/embed/' | split: '?' | first %}
     <div class="tis-playlist-embed">
-      <iframe src="{{ embed_url }}?utm_source=generator&theme=0" width="100%" height="80" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <iframe src="{{ embed_url }}?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
   {% endif %}
   <hr class="tis-divider">

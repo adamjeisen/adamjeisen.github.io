@@ -1,155 +1,89 @@
 ---
 ---
 
-@inproceedings{Eisen2025-tu,
-  title         = "Characterizing control between interacting subsystems with
-                   deep Jacobian estimation",
-  author        = "Eisen, Adam J. and Ostrow, Mitchell and Chandra, Sarthak and
-                   Kozachkov, Leo and Miller, Earl K and Fiete, Ila R",
-  booktitle     = {Advances in Neural Information Processing Systems (NeurIPS) Spotlight},
-  abstract      = "Biological function arises through the dynamical interactions of multiple subsystems, including those between brain areas, within gene regulatory networks, and more.  A common approach to understanding these systems is to model the dy- namics of each subsystem and characterize communication between them.  An alternative approach is through the lens of control theory:  how the subsystems control one another. This approach involves inferring the directionality, strength, and contextual modulation of control between subsystems.  However, methods for understanding subsystem control are typically linear and cannot adequately describe the rich contextual effects enabled by nonlinear complex systems.  To bridge this gap, we devise a data-driven nonlinear control-theoretic framework to characterize subsystem interactions via the Jacobian of the dynamics. We ad- dress the challenge of learning Jacobians from time-series data by proposing the JacobianODE, a deep learning method that leverages properties of the Jacobian to directly estimate it for arbitrary dynamical systems from data alone. We show that JacobianODEs outperform existing Jacobian estimation methods on challenging systems, including high-dimensional chaos. Applying our approach to a multi-area recurrent neural network (RNN) trained on a working memory selection task, we show that the “sensory” area gains greater control over the “cognitive” area over learning. Furthermore, we leverage the JacobianODE to directly control the trained RNN, enabling precise manipulation of its behavior. Our work lays the foundation for a theoretically grounded and data-driven understanding of interactions among biological subsystems.",
-  year          =  2025,
-  selected={true},
-  preview       = {area-control.png},
-}
-
-
-@ARTICLE{Eisen2024-vc,
-  title    = "Propofol anesthesia destabilizes neural dynamics across cortex",
-  author   = "Adam J. Eisen* and Kozachkov*, Leo and Bastos, Andre M. and
-              Donoghue, Jacob A. and Mahnke, Meredith K. and Brincat, Scott L. and
-              Chandra, Sarthak and Brown, Emery N. and Fiete, Ila R. and Miller,
-              Earl K.",
-  abstract = "Every day, hundreds of thousands of people undergo general
-              anesthesia. One hypothesis is that anesthesia disrupts dynamic
-              stability-the ability of the brain to balance excitability with
-              the need to be stable and controllable. To test this hypothesis,
-              we developed a method for quantifying changes in population-level
-              dynamic stability in complex systems: delayed linear analysis for
-              stability estimation (DeLASE). Propofol was used to transition
-              animals between the awake state and anesthetized unconsciousness.
-              DeLASE was applied to macaque cortex local field potentials
-              (LFPs). We found that neural dynamics were more unstable in
-              unconsciousness compared with the awake state. Cortical
-              trajectories mirrored predictions from destabilized linear
-              systems. We mimicked the effect of propofol in simulated neural
-              networks by increasing inhibitory tone. This in turn destabilized
-              the networks, as observed in the neural data. Our results suggest
-              that anesthesia disrupts dynamical stability that is required for
-              consciousness.",
-  journal  = "Neuron",
-  month    =  jul,
-  year     =  2024,
-  keywords = "Koopman operators; anesthesia; consciousness; dynamic stability;
-              dynamical systems; neural dynamics; non-human primates; propofol;
-              recurrent neural network; stability",
-  language = "en",
-  selected={true},
-  url={https://www.cell.com/neuron/fulltext/S0896-6273(24)00446-X},
-  html={https://www.cell.com/neuron/fulltext/S0896-6273(24)00446-X},
-  pdf={propofol.pdf},
-  preview={propofol.png},
-}
-
-@inproceedings{Ostrow2024-mb,
-  title         = "Delay Embedding Theory of Neural Sequence Models",
-  author        = "Ostrow, Mitchell B. and Eisen, Adam J. and Fiete, Ila R.",
-  abstract      = "To generate coherent responses, language models infer
-                   unobserved meaning from their input text sequence. One
-                   potential explanation for this capability arises from
-                   theories of delay embeddings in dynamical systems, which
-                   prove that unobserved variables can be recovered from the
-                   history of only a handful of observed variables. To test
-                   whether language models are effectively constructing delay
-                   embeddings, we measure the capacities of sequence models to
-                   reconstruct unobserved dynamics. We trained 1-layer
-                   transformer decoders and state-space sequence models on
-                   next-step prediction from noisy, partially-observed time
-                   series data. We found that each sequence layer can learn a
-                   viable embedding of the underlying system. However,
-                   state-space models have a stronger inductive bias than
-                   transformers-in particular, they more effectively
-                   reconstruct unobserved information at initialization,
-                   leading to more parameter-efficient models and lower error
-                   on dynamics tasks. Our work thus forges a novel connection
-                   between dynamical systems and deep learning sequence models
-                   via delay embedding theory.",
-  month         =  jun,
-  year          =  2024,
-  booktitle = {ICML Workshop on Next Generation Sequence Models},
-  primaryClass  = "cs.LG",
-  eprint        = "2406.11993",
-  html = {https://arxiv.org/abs/2406.11993},
-  url = {https://arxiv.org/abs/2406.11993},
-  pdf = {delay-sequence-models.pdf},
-  preview = {delay-sequence-models.png},
+@article{Eisen-similar,
+  title = {Similar destabilization of neural dynamics under different general anesthetics},
+  author = {Eisen, Adam J. and Bardon, Alexandra G. and Ballesteros, Jesus J. and Bastos, André M. and Donoghue, Jacob A. and Mahnke, Meredith K. and Brincat, Scott L. and Roy, Jefferson E. and Ishizawa, Yumiko and Brown, Emery N. and Fiete, Ila R. and Miller, Earl K.},
+  year = {2026},
+  journal = {Cell Reports},
+  url = {https://www.cell.com/cell-reports/fulltext/S2211-1247(26)00126-9},
+  abstract = {Different classes of anesthetics induce unconsciousness despite acting through distinct molecular mechanisms, raising the possibility that their convergent effects arise at the level of the dynamics of neural population activity. To explore this, we analyze intracortical electrophysiological recordings during infusions of propofol, ketamine, and dexmedetomidine, applying a rigorous method to estimate the stability of population dynamics during anesthesia. We find that all three anesthetics, despite their molecular differences, similarly affect cortical states by reducing dynamic stability. The estimated destabilization is corroborated by the slower recovery from sensory perturbations and longer stimulus-induced autocorrelation times observed during the anesthetic infusions. Destabilization is most prevalent in the low-frequency band of the population dynamics, linking it to the well-known increase in low-frequency power during anesthesia. Together, these findings suggest that cortical destabilization may be a shared neural correlate of anesthetic-induced unconsciousness and provide a plausible link to the low-frequency oscillations observed during anesthesia.},
+  html = {https://www.cell.com/cell-reports/fulltext/S2211-1247(26)00126-9},
   selected = {true},
+  preview = {eisen-similar.png}
+}
+
+@inproceedings{Eisen2025-tu,
+  abstract = {Biological function arises through the dynamical interactions of multiple subsystems, including those between brain areas, within gene regulatory networks, and more. A common approach to understanding these systems is to model the dy- namics of each subsystem and characterize communication between them. An alternative approach is through the lens of control theory: how the subsystems control one another. This approach involves inferring the directionality, strength, and contextual modulation of control between subsystems. However, methods for understanding subsystem control are typically linear and cannot adequately describe the rich contextual effects enabled by nonlinear complex systems. To bridge this gap, we devise a data-driven nonlinear control-theoretic framework to characterize subsystem interactions via the Jacobian of the dynamics. We ad- dress the challenge of learning Jacobians from time-series data by proposing the JacobianODE, a deep learning method that leverages properties of the Jacobian to directly estimate it for arbitrary dynamical systems from data alone. We show that JacobianODEs outperform existing Jacobian estimation methods on challenging systems, including high-dimensional chaos. Applying our approach to a multi-area recurrent neural network (RNN) trained on a working memory selection task, we show that the “sensory” area gains greater control over the “cognitive” area over learning. Furthermore, we leverage the JacobianODE to directly control the trained RNN, enabling precise manipulation of its behavior. Our work lays the foundation for a theoretically grounded and data-driven understanding of interactions among biological subsystems.},
+  author = {Eisen, Adam J. and Ostrow, Mitchell and Chandra, Sarthak and Kozachkov, Leo and Miller, Earl K and Fiete, Ila R},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS) Spotlight},
+  preview = {eisen2025-tu.png},
+  selected = {true},
+  title = {Characterizing control between interacting subsystems with deep Jacobian estimation},
+  year = {2025},
+  html = {https://openreview.net/forum?id=I822ZIRtms},
+  url = {https://openreview.net/forum?id=I822ZIRtms}
+}
+
+@article{Eisen2024-vc,
+  abstract = {Every day, hundreds of thousands of people undergo general anesthesia. One hypothesis is that anesthesia disrupts dynamic stability-the ability of the brain to balance excitability with the need to be stable and controllable. To test this hypothesis, we developed a method for quantifying changes in population-level dynamic stability in complex systems: delayed linear analysis for stability estimation (DeLASE). Propofol was used to transition animals between the awake state and anesthetized unconsciousness. DeLASE was applied to macaque cortex local field potentials (LFPs). We found that neural dynamics were more unstable in unconsciousness compared with the awake state. Cortical trajectories mirrored predictions from destabilized linear systems. We mimicked the effect of propofol in simulated neural networks by increasing inhibitory tone. This in turn destabilized the networks, as observed in the neural data. Our results suggest that anesthesia disrupts dynamical stability that is required for consciousness.},
+  author = {Adam J. Eisen* and Kozachkov*, Leo and Bastos, Andre M. and Donoghue, Jacob A. and Mahnke, Meredith K. and Brincat, Scott L. and Chandra, Sarthak and Brown, Emery N. and Fiete, Ila R. and Miller, Earl K.},
+  html = {https://www.cell.com/neuron/fulltext/S0896-6273(24)00446-X},
+  journal = {Neuron},
+  keywords = {Koopman operators; anesthesia; consciousness; dynamic stability; dynamical systems; neural dynamics; non-human primates; propofol; recurrent neural network; stability},
+  language = {en},
+  month = {July},
+  preview = {eisen2024-vc.png},
+  selected = {true},
+  title = {Propofol anesthesia destabilizes neural dynamics across cortex},
+  url = {https://www.cell.com/neuron/fulltext/S0896-6273(24)00446-X},
+  year = {2024}
 }
 
 @inproceedings{NEURIPS2023_6ac807c9,
- author={Mitchell B. Ostrow and Adam J. Eisen and Leo Kozachkov and Ila R. Fiete},
- booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
- editor = {A. Oh and T. Naumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
- pages = {33824--33837},
- publisher = {Curran Associates, Inc.},
- title = {Beyond Geometry: Comparing the Temporal Structure of Computation in Neural Circuits with Dynamical Similarity Analysis},
- url = {https://proceedings.neurips.cc/paper_files/paper/2023/file/6ac807c9b296964409b277369e55621a-Paper-Conference.pdf},
- volume = {36},
- year = {2023},
- url={https://proceedings.neurips.cc/paper_files/paper/2023/hash/6ac807c9b296964409b277369e55621a-Abstract-Conference.html},
- html={https://proceedings.neurips.cc/paper_files/paper/2023/hash/6ac807c9b296964409b277369e55621a-Abstract-Conference.html},
- abstract={How can we tell whether two neural networks utilize the same internal processes for a particular computation? This question is pertinent for multiple subfields of neuroscience and machine learning, including neuroAI, mechanistic interpretability, and brain-machine interfaces. Standard approaches for comparing neural networks focus on the spatial geometry of latent states. Yet in recurrent networks, computations are implemented at the level of dynamics, and two networks performing the same computation with equivalent dynamics need not exhibit the same geometry. To bridge this gap, we introduce a novel similarity metric that compares two systems at the level of their dynamics, called Dynamical Similarity Analysis (DSA). Our method incorporates two components: Using recent advances in data-driven dynamical systems theory, we learn a high-dimensional linear system that accurately captures core features of the original nonlinear dynamics. Next, we compare different systems passed through this embedding using a novel extension of Procrustes Analysis that accounts for how vector fields change under orthogonal transformation. In four case studies, we demonstrate that our method disentangles conjugate and non-conjugate recurrent neural networks (RNNs), while geometric methods fall short. We additionally show that our method can distinguish learning rules in an unsupervised manner. Our method opens the door to comparative analyses of the essential temporal structure of computation in neural circuits.},
- pdf={DSA.pdf},
- selected={true},
- preview={DSA.png},
- month=dec,
+  abstract = {How can we tell whether two neural networks utilize the same internal processes for a particular computation? This question is pertinent for multiple subfields of neuroscience and machine learning, including neuroAI, mechanistic interpretability, and brain-machine interfaces. Standard approaches for comparing neural networks focus on the spatial geometry of latent states. Yet in recurrent networks, computations are implemented at the level of dynamics, and two networks performing the same computation with equivalent dynamics need not exhibit the same geometry. To bridge this gap, we introduce a novel similarity metric that compares two systems at the level of their dynamics, called Dynamical Similarity Analysis (DSA). Our method incorporates two components: Using recent advances in data-driven dynamical systems theory, we learn a high-dimensional linear system that accurately captures core features of the original nonlinear dynamics. Next, we compare different systems passed through this embedding using a novel extension of Procrustes Analysis that accounts for how vector fields change under orthogonal transformation. In four case studies, we demonstrate that our method disentangles conjugate and non-conjugate recurrent neural networks (RNNs), while geometric methods fall short. We additionally show that our method can distinguish learning rules in an unsupervised manner. Our method opens the door to comparative analyses of the essential temporal structure of computation in neural circuits.},
+  author = {Mitchell B. Ostrow and Adam J. Eisen and Leo Kozachkov and Ila R. Fiete},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  editor = {A. Oh and T. Naumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
+  html = {https://proceedings.neurips.cc/paper_files/paper/2023/hash/6ac807c9b296964409b277369e55621a-Abstract-Conference.html},
+  month = {December},
+  pages = {33824--33837},
+  preview = {neurips2023-6ac807c9.png},
+  publisher = {Curran Associates, Inc.},
+  selected = {true},
+  title = {Beyond Geometry: Comparing the Temporal Structure of Computation in Neural Circuits with Dynamical Similarity Analysis},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2023/file/6ac807c9b296964409b277369e55621a-Paper-Conference.pdf},
+  volume = {36},
+  year = {2023}
 }
 
+@inproceedings{Ostrow2024-mb,
+  abstract = {To generate coherent responses, language models infer unobserved meaning from their input text sequence. One potential explanation for this capability arises from theories of delay embeddings in dynamical systems, which prove that unobserved variables can be recovered from the history of only a handful of observed variables. To test whether language models are effectively constructing delay embeddings, we measure the capacities of sequence models to reconstruct unobserved dynamics. We trained 1-layer transformer decoders and state-space sequence models on next-step prediction from noisy, partially-observed time series data. We found that each sequence layer can learn a viable embedding of the underlying system. However, state-space models have a stronger inductive bias than transformers-in particular, they more effectively reconstruct unobserved information at initialization, leading to more parameter-efficient models and lower error on dynamics tasks. Our work thus forges a novel connection between dynamical systems and deep learning sequence models via delay embedding theory.},
+  author = {Ostrow, Mitchell B. and Eisen, Adam J. and Fiete, Ila R.},
+  booktitle = {ICML Workshop on Next Generation Sequence Models},
+  eprint = {2406.11993},
+  html = {https://arxiv.org/abs/2406.11993},
+  month = {June},
+  preview = {ostrow2024-mb.png},
+  primaryclass = {cs.LG},
+  title = {Delay Embedding Theory of Neural Sequence Models},
+  url = {https://arxiv.org/abs/2406.11993},
+  year = {2024},
+  selected = {true}
+}
 
-% The entry below contains non-ASCII chars that could not be converted
-% to a LaTeX equivalent.
-@ARTICLE{Das2018-yb,
-  title    = "A Lattice Model of Charge-Pattern-Dependent Polyampholyte Phase
-              Separation",
-  author   = "Das, Suman and Eisen, Adam J. and Lin, Yi-Hsuan and Chan, Hue Sun",
-  abstract = "In view of recent intense experimental and theoretical interests
-              in the biophysics of liquid-liquid phase separation (LLPS) of
-              intrinsically disordered proteins (IDPs), heteropolymer models
-              with chain molecules configured as self-avoiding walks on the
-              simple cubic lattice are constructed to study how phase behaviors
-              depend on the sequence of monomers along the chains. To address
-              pertinent general principles, we focus primarily on two fully
-              charged 50-monomer sequences with significantly different charge
-              patterns. Each monomer in our models occupies a single lattice
-              site, and all monomers interact via a screened pairwise Coulomb
-              potential. Phase diagrams are obtained by extensive Monte Carlo
-              sampling performed at multiple temperatures on ensembles of 300
-              chains in boxes of sizes ranging from 52 x 52 x 52
-              to 246 x 246 x 246 to simulate a large number of
-              different systems with the overall polymer volume fraction ϕ in
-              each system varying from 0.001 to 0.1. Phase separation in the
-              model systems is characterized by the emergence of a large
-              cluster connected by intermonomer nearest-neighbor lattice
-              contacts and by large fluctuations in local polymer density. The
-              simulated critical temperatures, Tcr, of phase separation for the
-              two sequences differ significantly, whereby the sequence with a
-              more ``blocky'' charge pattern exhibits a substantially higher
-              propensity to phase separate. The trend is consistent with our
-              sequence-specific random-phase-approximation (RPA) polymer
-              theory, but the variation of the simulated Tcr with a previously
-              proposed ``sequence charge decoration'' pattern parameter is
-              milder than that predicted by RPA. Ramifications of our findings
-              for the development of analytical theory and simulation protocols
-              of IDP LLPS are discussed.",
-  journal  = "J. Phys. Chem. B",
-  volume   =  122,
-  number   =  21,
-  pages    = "5418--5431",
-  month    =  may,
-  year     =  2018,
-  language = "en",
-  url = {https://pubs.acs.org/doi/10.1021/acs.jpcb.7b11723},
+@article{Das2018-yb,
+  abstract = {In view of recent intense experimental and theoretical interests in the biophysics of liquid-liquid phase separation (LLPS) of intrinsically disordered proteins (IDPs), heteropolymer models with chain molecules configured as self-avoiding walks on the simple cubic lattice are constructed to study how phase behaviors depend on the sequence of monomers along the chains. To address pertinent general principles, we focus primarily on two fully charged 50-monomer sequences with significantly different charge patterns. Each monomer in our models occupies a single lattice site, and all monomers interact via a screened pairwise Coulomb potential. Phase diagrams are obtained by extensive Monte Carlo sampling performed at multiple temperatures on ensembles of 300 chains in boxes of sizes ranging from 52 x 52 x 52 to 246 x 246 x 246 to simulate a large number of different systems with the overall polymer volume fraction ϕ in each system varying from 0.001 to 0.1. Phase separation in the model systems is characterized by the emergence of a large cluster connected by intermonomer nearest-neighbor lattice contacts and by large fluctuations in local polymer density. The simulated critical temperatures, Tcr, of phase separation for the two sequences differ significantly, whereby the sequence with a more ``blocky'' charge pattern exhibits a substantially higher propensity to phase separate. The trend is consistent with our sequence-specific random-phase-approximation (RPA) polymer theory, but the variation of the simulated Tcr with a previously proposed ``sequence charge decoration'' pattern parameter is milder than that predicted by RPA. Ramifications of our findings for the development of analytical theory and simulation protocols of IDP LLPS are discussed.},
+  author = {Das, Suman and Eisen, Adam J. and Lin, Yi-Hsuan and Chan, Hue Sun},
   html = {https://pubs.acs.org/doi/10.1021/acs.jpcb.7b11723},
-  preview = {lattice.png},
+  journal = {J. Phys. Chem. B},
+  language = {en},
+  month = {May},
+  number = {21},
+  pages = {5418--5431},
+  preview = {das2018-yb.png},
+  title = {A Lattice Model of Charge-Pattern-Dependent Polyampholyte Phase Separation},
+  url = {https://pubs.acs.org/doi/10.1021/acs.jpcb.7b11723},
+  volume = {122},
+  year = {2018}
 }
-

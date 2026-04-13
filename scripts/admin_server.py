@@ -27,6 +27,13 @@ import cloudinary
 import cloudinary.api
 import cloudinary.uploader
 
+from admin_helpers import (
+    parse_markdown, serialize_markdown, read_markdown_file, write_markdown_file,
+    list_markdown_dir, read_yaml, write_yaml, read_yaml_with_comments,
+    write_yaml_raw, read_config_field, update_config_field,
+    read_bib, write_bib, slugify,
+)
+
 load_dotenv()
 
 # ---------------------------------------------------------------------------
@@ -37,6 +44,19 @@ CSV_PATH = REPO_ROOT / "_data" / "albumsilike.csv"
 COVERS_DIR = REPO_ROOT / "assets" / "img" / "albums I like"
 CSV_FIELDS = ["Artist", "Album", "Genre", "Year", "SpotifyUrl"]
 THINGS_I_SAW_PATH = REPO_ROOT / "_data" / "feelings.json"
+
+# Content directories
+NEWS_DIR = REPO_ROOT / "_news"
+POSTS_DIR = REPO_ROOT / "_posts"
+PROJECTS_DIR = REPO_ROOT / "_projects"
+BOOKS_DIR = REPO_ROOT / "_books"
+BIB_PATH = REPO_ROOT / "_bibliography" / "papers.bib"
+CONFIG_PATH = REPO_ROOT / "_config.yml"
+SOCIALS_PATH = REPO_ROOT / "_data" / "socials.yml"
+ABOUT_PATH = REPO_ROOT / "_pages" / "about.md"
+PUB_PREVIEW_DIR = REPO_ROOT / "assets" / "img" / "publication_preview"
+PDF_DIR = REPO_ROOT / "assets" / "pdf"
+BOOK_COVERS_DIR = REPO_ROOT / "assets" / "img" / "book_covers"
 
 # ---------------------------------------------------------------------------
 # Spotify client (optional — photo admin works without it)
@@ -416,8 +436,14 @@ HTML = r"""<!DOCTYPE html>
   <span>&#9835;</span>
   <h1>Albums Admin</h1>
   <nav>
-    <a href="/" class="active">&#9835; Albums</a>
-    <a href="/photos">&#128247; Photos</a>
+    <a href="/" class="active">Albums</a>
+    <a href="/photos">Photos</a>
+    <a href="/news">News</a>
+    <a href="/blog">Blog</a>
+    <a href="/projects">Projects</a>
+    <a href="/books">Books</a>
+    <a href="/publications">Pubs</a>
+    <a href="/settings">Settings</a>
   </nav>
   <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">Light</button>
 </header>
@@ -1067,6 +1093,502 @@ def tis_move_photo_between_events(month_id):
 
 
 # ---------------------------------------------------------------------------
+# News API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/news")
+def api_news_list():
+    items = list_markdown_dir(NEWS_DIR)
+    return jsonify(items)
+
+
+@app.route("/api/news", methods=["POST"])
+def api_news_create():
+    body = request.json or {}
+    title = (body.get("title") or "").strip()
+    if not title:
+        return jsonify({"error": "Title is required"}), 400
+    filename = slugify(title) + ".md"
+    path = NEWS_DIR / filename
+    if path.exists():
+        return jsonify({"error": f"File '{filename}' already exists"}), 409
+    data = {
+        "layout": "post",
+        "date": body.get("date", ""),
+        "inline": body.get("inline", True),
+        "show": body.get("show", True),
+    }
+    write_markdown_file(path, {**data, "body": body.get("body", "")})
+    return jsonify({"ok": True, "filename": filename})
+
+
+@app.route("/api/news/<filename>", methods=["PUT"])
+def api_news_update(filename):
+    path = NEWS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    body = request.json or {}
+    existing = read_markdown_file(path)
+    if "date" in body:
+        existing["date"] = body["date"]
+    if "inline" in body:
+        existing["inline"] = body["inline"]
+    if "show" in body:
+        existing["show"] = body["show"]
+    if "body" in body:
+        existing["body"] = body["body"]
+    write_markdown_file(path, existing)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/news/<filename>", methods=["DELETE"])
+def api_news_delete(filename):
+    path = NEWS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    path.unlink()
+    return jsonify({"ok": True})
+
+
+# ---------------------------------------------------------------------------
+# Blog Posts API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/posts")
+def api_posts_list():
+    items = list_markdown_dir(POSTS_DIR)
+    # Exclude examples subdirectory (only .md in root)
+    return jsonify(items)
+
+
+@app.route("/api/posts", methods=["POST"])
+def api_posts_create():
+    body = request.json or {}
+    title = (body.get("title") or "").strip()
+    date = (body.get("date") or "").strip()
+    if not title or not date:
+        return jsonify({"error": "Title and date are required"}), 400
+    # Date should be YYYY-MM-DD format
+    date_prefix = date[:10]
+    filename = f"{date_prefix}-{slugify(title)}.md"
+    path = POSTS_DIR / filename
+    if path.exists():
+        return jsonify({"error": f"File '{filename}' already exists"}), 409
+    data = {
+        "layout": "post",
+        "title": title,
+        "date": body.get("date", ""),
+        "description": body.get("description", ""),
+        "tags": body.get("tags", ""),
+        "categories": body.get("categories", ""),
+        "thumbnail": body.get("thumbnail", ""),
+        "published": body.get("published", True),
+    }
+    write_markdown_file(path, {**data, "body": body.get("body", "")})
+    return jsonify({"ok": True, "filename": filename})
+
+
+@app.route("/api/posts/<filename>", methods=["PUT"])
+def api_posts_update(filename):
+    path = POSTS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    body = request.json or {}
+    existing = read_markdown_file(path)
+    for key in ("title", "date", "description", "tags", "categories", "thumbnail", "published", "body", "importance"):
+        if key in body:
+            existing[key] = body[key]
+    write_markdown_file(path, existing)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/posts/<filename>", methods=["DELETE"])
+def api_posts_delete(filename):
+    path = POSTS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    path.unlink()
+    return jsonify({"ok": True})
+
+
+# ---------------------------------------------------------------------------
+# Projects API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/projects")
+def api_projects_list():
+    items = list_markdown_dir(PROJECTS_DIR)
+    return jsonify(items)
+
+
+@app.route("/api/projects", methods=["POST"])
+def api_projects_create():
+    body = request.json or {}
+    title = (body.get("title") or "").strip()
+    if not title:
+        return jsonify({"error": "Title is required"}), 400
+    # Number based on existing files
+    existing = sorted(PROJECTS_DIR.glob("*.md"))
+    num = len(existing) + 1
+    filename = f"{num}_project.md"
+    path = PROJECTS_DIR / filename
+    data = {
+        "layout": "page",
+        "title": title,
+        "description": body.get("description", ""),
+        "img": body.get("img", ""),
+        "importance": body.get("importance", num),
+        "category": body.get("category", ""),
+        "related_publications": body.get("related_publications", False),
+    }
+    write_markdown_file(path, {**data, "body": body.get("body", "")})
+    return jsonify({"ok": True, "filename": filename})
+
+
+@app.route("/api/projects/<filename>", methods=["PUT"])
+def api_projects_update(filename):
+    path = PROJECTS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    body = request.json or {}
+    existing = read_markdown_file(path)
+    for key in ("title", "description", "img", "importance", "category", "related_publications", "body"):
+        if key in body:
+            existing[key] = body[key]
+    write_markdown_file(path, existing)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/projects/<filename>", methods=["DELETE"])
+def api_projects_delete(filename):
+    path = PROJECTS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    path.unlink()
+    return jsonify({"ok": True})
+
+
+@app.route("/api/projects/upload-image", methods=["POST"])
+def api_projects_upload_image():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    filename = file.filename or "image.jpg"
+    dest = REPO_ROOT / "assets" / "img" / filename
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    file.save(dest)
+    return jsonify({"ok": True, "path": f"assets/img/{filename}"})
+
+
+# ---------------------------------------------------------------------------
+# Books API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/books")
+def api_books_list():
+    items = list_markdown_dir(BOOKS_DIR)
+    return jsonify(items)
+
+
+@app.route("/api/books", methods=["POST"])
+def api_books_create():
+    body = request.json or {}
+    title = (body.get("title") or "").strip()
+    if not title:
+        return jsonify({"error": "Title is required"}), 400
+    filename = slugify(title) + ".md"
+    path = BOOKS_DIR / filename
+    if path.exists():
+        return jsonify({"error": f"File '{filename}' already exists"}), 409
+    data = {
+        "layout": "book-review",
+        "title": title,
+        "author": body.get("author", ""),
+        "cover": body.get("cover", ""),
+        "isbn": body.get("isbn", ""),
+        "olid": body.get("olid", ""),
+        "categories": body.get("categories", ""),
+        "tags": body.get("tags", ""),
+        "buy_link": body.get("buy_link", ""),
+        "started": body.get("started", ""),
+        "finished": body.get("finished", ""),
+        "released": body.get("released", ""),
+        "stars": body.get("stars", ""),
+        "status": body.get("status", "Reading"),
+    }
+    write_markdown_file(path, {**data, "body": body.get("body", "")})
+    return jsonify({"ok": True, "filename": filename})
+
+
+@app.route("/api/books/<filename>", methods=["PUT"])
+def api_books_update(filename):
+    path = BOOKS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    body = request.json or {}
+    existing = read_markdown_file(path)
+    for key in ("title", "author", "cover", "isbn", "olid", "categories", "tags",
+                "buy_link", "started", "finished", "released", "stars", "status", "body"):
+        if key in body:
+            existing[key] = body[key]
+    write_markdown_file(path, existing)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/books/<filename>", methods=["DELETE"])
+def api_books_delete(filename):
+    path = BOOKS_DIR / filename
+    if not path.exists():
+        return jsonify({"error": "Not found"}), 404
+    path.unlink()
+    return jsonify({"ok": True})
+
+
+@app.route("/api/books/upload-cover", methods=["POST"])
+def api_books_upload_cover():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    filename = file.filename or "cover.jpg"
+    BOOK_COVERS_DIR.mkdir(parents=True, exist_ok=True)
+    dest = BOOK_COVERS_DIR / filename
+    file.save(dest)
+    return jsonify({"ok": True, "path": f"assets/img/book_covers/{filename}"})
+
+
+# ---------------------------------------------------------------------------
+# Publications API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/publications")
+def api_pubs_list():
+    entries = read_bib(BIB_PATH)
+    return jsonify(entries)
+
+
+@app.route("/api/publications", methods=["POST"])
+def api_pubs_create():
+    body = request.json or {}
+    key = (body.get("key") or "").strip()
+    if not key:
+        return jsonify({"error": "Citation key is required"}), 400
+    entries = read_bib(BIB_PATH)
+    if any(e["key"] == key for e in entries):
+        return jsonify({"error": f"Key '{key}' already exists"}), 409
+    entry = {
+        "entry_type": body.get("entry_type", "article"),
+        "key": key,
+    }
+    for field in ("title", "author", "year", "journal", "booktitle", "abstract",
+                  "url", "html", "pdf", "preview", "selected", "month",
+                  "volume", "number", "pages", "keywords", "language", "eprint", "primaryClass"):
+        if field in body and body[field]:
+            entry[field] = str(body[field])
+    entries.insert(0, entry)  # newest first
+    write_bib(BIB_PATH, entries)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/publications/<key>", methods=["PUT"])
+def api_pubs_update(key):
+    body = request.json or {}
+    entries = read_bib(BIB_PATH)
+    idx = next((i for i, e in enumerate(entries) if e["key"] == key), -1)
+    if idx == -1:
+        return jsonify({"error": "Not found"}), 404
+    for field in ("title", "author", "year", "journal", "booktitle", "abstract",
+                  "url", "html", "pdf", "preview", "selected", "month",
+                  "volume", "number", "pages", "keywords", "language",
+                  "eprint", "primaryClass", "entry_type"):
+        if field in body:
+            if body[field]:
+                entries[idx][field] = str(body[field])
+            else:
+                entries[idx].pop(field, None)
+    write_bib(BIB_PATH, entries)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/publications/<key>", methods=["DELETE"])
+def api_pubs_delete(key):
+    entries = read_bib(BIB_PATH)
+    entries = [e for e in entries if e["key"] != key]
+    write_bib(BIB_PATH, entries)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/publications/<key>/preview", methods=["POST"])
+def api_pubs_upload_preview(key):
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    ext = Path(file.filename).suffix if file.filename else ".png"
+    dest_name = f"{slugify(key)}{ext}"
+    PUB_PREVIEW_DIR.mkdir(parents=True, exist_ok=True)
+    dest = PUB_PREVIEW_DIR / dest_name
+    file.save(dest)
+    # Update the bib entry
+    entries = read_bib(BIB_PATH)
+    idx = next((i for i, e in enumerate(entries) if e["key"] == key), -1)
+    if idx != -1:
+        entries[idx]["preview"] = dest_name
+        write_bib(BIB_PATH, entries)
+    return jsonify({"ok": True, "preview": dest_name})
+
+
+@app.route("/api/publications/<key>/pdf", methods=["POST"])
+def api_pubs_upload_pdf(key):
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    dest_name = file.filename or f"{slugify(key)}.pdf"
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+    dest = PDF_DIR / dest_name
+    file.save(dest)
+    entries = read_bib(BIB_PATH)
+    idx = next((i for i, e in enumerate(entries) if e["key"] == key), -1)
+    if idx != -1:
+        entries[idx]["pdf"] = dest_name
+        write_bib(BIB_PATH, entries)
+    return jsonify({"ok": True, "pdf": dest_name})
+
+
+@app.route("/api/publications/reorder", methods=["POST"])
+def api_pubs_reorder():
+    body = request.json or {}
+    keys = body.get("keys", [])
+    if not keys:
+        return jsonify({"error": "keys list is required"}), 400
+    entries = read_bib(BIB_PATH)
+    entry_map = {e["key"]: e for e in entries}
+    reordered = []
+    for key in keys:
+        if key in entry_map:
+            reordered.append(entry_map.pop(key))
+    # Append any entries not in the keys list (shouldn't happen, but safe)
+    reordered.extend(entry_map.values())
+    write_bib(BIB_PATH, reordered)
+    return jsonify({"ok": True})
+
+
+# ---------------------------------------------------------------------------
+# Site Settings API
+# ---------------------------------------------------------------------------
+
+@app.route("/api/settings/site")
+def api_settings_site():
+    text = read_yaml_with_comments(CONFIG_PATH)
+    fields = {}
+    for key in ("first_name", "middle_name", "last_name", "title", "description",
+                "footer_text", "blog_name", "blog_description"):
+        fields[key] = read_config_field(text, key)
+    return jsonify(fields)
+
+
+@app.route("/api/settings/site", methods=["PUT"])
+def api_settings_site_update():
+    body = request.json or {}
+    text = read_yaml_with_comments(CONFIG_PATH)
+    for key in ("first_name", "middle_name", "last_name", "title", "description",
+                "footer_text", "blog_name", "blog_description"):
+        if key in body:
+            text = update_config_field(text, key, body[key])
+    write_yaml_raw(CONFIG_PATH, text)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/settings/about")
+def api_settings_about():
+    data = read_markdown_file(ABOUT_PATH)
+    return jsonify(data)
+
+
+@app.route("/api/settings/about", methods=["PUT"])
+def api_settings_about_update():
+    body = request.json or {}
+    existing = read_markdown_file(ABOUT_PATH)
+    # Update front matter fields
+    if "subtitle" in body:
+        existing["subtitle"] = body["subtitle"]
+    if "body" in body:
+        existing["body"] = body["body"]
+    if "profile" in body:
+        existing["profile"] = body["profile"]
+    if "announcements" in body:
+        existing["announcements"] = body["announcements"]
+    if "latest_posts" in body:
+        existing["latest_posts"] = body["latest_posts"]
+    if "selected_papers" in body:
+        existing["selected_papers"] = body["selected_papers"]
+    write_markdown_file(ABOUT_PATH, existing)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/settings/socials")
+def api_settings_socials():
+    text = read_yaml_with_comments(SOCIALS_PATH)
+    # Parse both active and commented-out entries
+    socials = {}
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        commented = line.startswith("#")
+        clean = line.lstrip("# ").strip()
+        if ":" in clean:
+            key = clean.split(":")[0].strip()
+            val = ":".join(clean.split(":")[1:]).strip()
+            # Skip comment-only lines that aren't social entries
+            if key in ("this", "the", "can"):
+                continue
+            socials[key] = {"value": val if not commented else "", "enabled": not commented, "comment_value": val}
+    return jsonify(socials)
+
+
+@app.route("/api/settings/socials", methods=["PUT"])
+def api_settings_socials_update():
+    body = request.json or {}
+    # Rebuild the socials.yml preserving the original structure
+    original = read_yaml_with_comments(SOCIALS_PATH)
+    lines = original.splitlines()
+    new_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            new_lines.append(line)
+            continue
+        # Check if this is a social entry (active or commented)
+        commented = stripped.startswith("#")
+        clean = stripped.lstrip("# ").strip()
+        if ":" in clean:
+            key = clean.split(":")[0].strip()
+            if key in body:
+                val = body[key].get("value", "")
+                enabled = body[key].get("enabled", False)
+                if enabled and val:
+                    new_lines.append(f"{key}: {val}")
+                elif enabled:
+                    new_lines.append(f"{key}:")
+                else:
+                    comment_val = body[key].get("comment_value", val)
+                    new_lines.append(f"# {key}: {comment_val}")
+                continue
+        new_lines.append(line)
+    write_yaml_raw(SOCIALS_PATH, "\n".join(new_lines) + "\n")
+    return jsonify({"ok": True})
+
+
+@app.route("/api/settings/profile-photo", methods=["POST"])
+def api_settings_profile_photo():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files["file"]
+    dest = REPO_ROOT / "assets" / "img" / "prof_pic.jpg"
+    file.save(dest)
+    return jsonify({"ok": True})
+
+
+# ---------------------------------------------------------------------------
 # Photos admin HTML UI
 # ---------------------------------------------------------------------------
 PHOTOS_HTML = r"""<!DOCTYPE html>
@@ -1227,8 +1749,14 @@ PHOTOS_HTML = r"""<!DOCTYPE html>
 <header>
   <h1>&#128247; Feelings — Admin</h1>
   <nav>
-    <a href="/">&#9835; Albums</a>
-    <a href="/photos" class="active">&#128247; Photos</a>
+    <a href="/">Albums</a>
+    <a href="/photos" class="active">Photos</a>
+    <a href="/news">News</a>
+    <a href="/blog">Blog</a>
+    <a href="/projects">Projects</a>
+    <a href="/books">Books</a>
+    <a href="/publications">Pubs</a>
+    <a href="/settings">Settings</a>
   </nav>
   <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">Light</button>
 </header>
@@ -1853,9 +2381,951 @@ loadMonths();
 """
 
 
+# ---------------------------------------------------------------------------
+# Shared HTML builder for new admin pages
+# ---------------------------------------------------------------------------
+
+SHARED_CSS = """
+  :root {
+    --bg: #0f0f0f; --bg-raised: #141414; --bg-card: #1a1a1a;
+    --border: #2a2a2a; --border-light: #222; --border-row: #1e1e1e;
+    --text: #e0e0e0; --text-strong: #fff; --text-muted: #999; --text-faint: #666; --text-faintest: #444;
+    --input-bg: #1e1e1e;
+    --accent: #f3931e; --accent-hover: #e0850a;
+    --error: #e05252; --error-bg: rgba(224,82,82,0.1); --error-border: rgba(224,82,82,0.3);
+    --success: #4caf50; --success-bg: rgba(76,175,80,0.1); --success-border: rgba(76,175,80,0.3);
+    --hover-bg: #1a1a1a; --active-bg: #1f1700;
+    --overlay: rgba(0,0,0,0.5);
+  }
+  [data-theme="light"] {
+    --bg: #f5f5f5; --bg-raised: #fff; --bg-card: #fff;
+    --border: #ddd; --border-light: #e0e0e0; --border-row: #eee;
+    --text: #333; --text-strong: #111; --text-muted: #777; --text-faint: #999; --text-faintest: #bbb;
+    --input-bg: #fff; --active-bg: #fff3e0; --hover-bg: #f0f0f0; --overlay: rgba(0,0,0,0.5);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--bg-raised); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 1.2rem; font-weight: 600; color: var(--text-strong); }
+  header nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  header nav a { color: var(--text-muted); text-decoration: none; font-size: 0.82rem; padding: 4px 10px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+  header nav a:hover { color: var(--text); background: var(--hover-bg); }
+  header nav a.active { color: var(--accent); font-weight: 600; }
+  .theme-toggle { margin-left: auto; background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: var(--text-muted); font-size: 0.82rem; cursor: pointer; }
+  .theme-toggle:hover { color: var(--text); border-color: var(--text-faint); }
+  .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+  .btn-primary { background: var(--accent); color: #000; border: none; border-radius: 6px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-sm { background: transparent; border: 1px solid var(--border); border-radius: 5px; padding: 4px 10px; color: var(--text-muted); font-size: 0.78rem; cursor: pointer; white-space: nowrap; }
+  .btn-sm:hover { color: var(--text); border-color: var(--text-faint); }
+  .btn-danger { color: var(--error); border-color: var(--error); }
+  .btn-danger:hover { background: var(--error); color: #fff; }
+  #status { display: none; position: fixed; bottom: 20px; right: 20px; padding: 11px 16px; border-radius: 8px; font-size: 0.85rem; z-index: 999; max-width: 340px; }
+  #status.success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); display: block; }
+  #status.error { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-border); display: block; }
+  .card { background: var(--bg-raised); border: 1px solid var(--border-light); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border-row); cursor: pointer; }
+  .card-header:hover { background: var(--hover-bg); }
+  .card-body { padding: 14px 16px; display: none; }
+  .card-body.open { display: block; }
+  .form-group { margin-bottom: 10px; }
+  .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 0.85rem; font-family: inherit; outline: none; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group textarea { min-height: 120px; resize: vertical; }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  .toggle { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); cursor: pointer; }
+  .toggle input { width: auto; }
+  .section-title { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
+  .add-form { background: var(--bg-raised); border: 1px solid var(--border-light); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+  .add-form h2 { font-size: 0.9rem; font-weight: 600; color: var(--text-strong); margin-bottom: 12px; }
+  .card-title { font-size: 0.9rem; font-weight: 500; color: var(--text); flex: 1; }
+  .card-meta { font-size: 0.75rem; color: var(--text-faint); }
+  .card-actions { display: flex; gap: 6px; }
+  .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-faint); }
+  .badge.active { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; background: var(--border); }
+  .empty-state { color: var(--text-faintest); text-align: center; padding: 40px; font-size: 0.88rem; }
+"""
+
+SHARED_JS = """
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg; el.className = type;
+  clearTimeout(el._t); el._t = setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 3500);
+  el.style.display = 'block';
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'light' ? 'Dark' : 'Light';
+  localStorage.setItem('photos-admin-theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('photos-admin-theme');
+  if (saved) { document.documentElement.setAttribute('data-theme', saved); }
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = document.documentElement.getAttribute('data-theme');
+    document.getElementById('theme-btn').textContent = t === 'light' ? 'Dark' : 'Light';
+  });
+})();
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escJs(s) { return String(s||'').replace(/\\\\/g,'\\\\\\\\').replace(/'/g,"\\\\'"); }
+
+function toggleCard(el) {
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+}
+"""
+
+
+def make_page(title, nav_active, body_html, extra_css="", extra_js=""):
+    """Generate a full admin page HTML string."""
+    nav_items = [
+        ("/", "Albums"), ("/photos", "Photos"), ("/news", "News"),
+        ("/blog", "Blog"), ("/projects", "Projects"), ("/books", "Books"),
+        ("/publications", "Pubs"), ("/settings", "Settings"),
+    ]
+    nav_html = "\n    ".join(
+        f'<a href="{href}" class="active">{label}</a>' if href == nav_active
+        else f'<a href="{href}">{label}</a>'
+        for href, label in nav_items
+    )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title} — Admin</title>
+<style>{SHARED_CSS}{extra_css}</style>
+</head>
+<body>
+<header>
+  <h1>{title}</h1>
+  <nav>
+    {nav_html}
+  </nav>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">Light</button>
+</header>
+<div id="status"></div>
+<div class="container">
+{body_html}
+</div>
+<script>
+{SHARED_JS}
+{extra_js}
+</script>
+</body>
+</html>"""
+
+
+# ---------------------------------------------------------------------------
+# News Admin HTML
+# ---------------------------------------------------------------------------
+
+NEWS_HTML = make_page("News", "/news", """
+<div class="add-form" id="add-form">
+  <h2>Add News Item</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Title (used as filename slug)</label><input id="new-title" placeholder="e.g. NeurIPS 2025"></div>
+    <div class="form-group"><label>Date</label><input id="new-date" type="datetime-local"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="toggle"><input type="checkbox" id="new-inline" checked> Inline</label></div>
+    <div class="form-group"><label class="toggle"><input type="checkbox" id="new-show" checked> Show</label></div>
+  </div>
+  <div class="form-group"><label>Body (Markdown)</label><textarea id="new-body" rows="4"></textarea></div>
+  <button class="btn-primary" onclick="createNews()">+ Add News</button>
+</div>
+<div id="news-list"></div>
+""", extra_js="""
+let allNews = [];
+
+async function loadNews() {
+  const res = await fetch('/api/news');
+  allNews = await res.json();
+  renderNews();
+}
+
+function renderNews() {
+  const el = document.getElementById('news-list');
+  if (!allNews.length) { el.innerHTML = '<div class="empty-state">No news items yet.</div>'; return; }
+  el.innerHTML = allNews.map(n => {
+    const dateStr = n.date ? String(n.date).substring(0, 16) : '';
+    return `
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-title">${escHtml(n.body ? n.body.substring(0, 80) : '(empty)')}</span>
+        <span class="card-meta">${escHtml(dateStr)}</span>
+        ${n.show ? '<span class="badge active">visible</span>' : '<span class="badge">hidden</span>'}
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group"><label>Date</label><input value="${escHtml(dateStr)}" onblur="updateNews('${escJs(n.filename)}', 'date', this.value)"></div>
+          <div class="form-group"><label class="toggle"><input type="checkbox" ${n.inline ? 'checked' : ''} onchange="updateNews('${escJs(n.filename)}', 'inline', this.checked)"> Inline</label></div>
+          <div class="form-group"><label class="toggle"><input type="checkbox" ${n.show ? 'checked' : ''} onchange="updateNews('${escJs(n.filename)}', 'show', this.checked)"> Show</label></div>
+        </div>
+        <div class="form-group"><label>Body</label><textarea onblur="updateNews('${escJs(n.filename)}', 'body', this.value)">${escHtml(n.body || '')}</textarea></div>
+        <div class="card-actions">
+          <button class="btn-sm btn-danger" onclick="deleteNews('${escJs(n.filename)}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function createNews() {
+  const title = document.getElementById('new-title').value.trim();
+  const date = document.getElementById('new-date').value;
+  const inline = document.getElementById('new-inline').checked;
+  const show = document.getElementById('new-show').checked;
+  const body = document.getElementById('new-body').value;
+  if (!title) { showStatus('Title is required', 'error'); return; }
+  const res = await fetch('/api/news', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, date, inline, show, body}),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Created news item', 'success');
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-body').value = '';
+  await loadNews();
+}
+
+async function updateNews(filename, field, value) {
+  const res = await fetch('/api/news/' + encodeURIComponent(filename), {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else await loadNews();
+}
+
+async function deleteNews(filename) {
+  if (!confirm('Delete this news item?')) return;
+  const res = await fetch('/api/news/' + encodeURIComponent(filename), {method: 'DELETE'});
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Deleted', 'success');
+  await loadNews();
+}
+
+loadNews();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Blog Admin HTML
+# ---------------------------------------------------------------------------
+
+BLOG_HTML = make_page("Blog Posts", "/blog", """
+<div class="add-form" id="add-form">
+  <h2>Add Blog Post</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Title</label><input id="new-title" placeholder="My New Post"></div>
+    <div class="form-group"><label>Date</label><input id="new-date" type="datetime-local"></div>
+  </div>
+  <div class="form-group"><label>Description</label><input id="new-desc" placeholder="A brief description..."></div>
+  <div class="form-row">
+    <div class="form-group"><label>Tags</label><input id="new-tags" placeholder="tag1, tag2"></div>
+    <div class="form-group"><label>Categories</label><input id="new-cats" placeholder="research"></div>
+  </div>
+  <div class="form-group"><label>Body (Markdown)</label><textarea id="new-body" rows="6"></textarea></div>
+  <button class="btn-primary" onclick="createPost()">+ Add Post</button>
+</div>
+<div id="posts-list"></div>
+""", extra_js="""
+let allPosts = [];
+
+async function loadPosts() {
+  const res = await fetch('/api/posts');
+  allPosts = await res.json();
+  allPosts.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  renderPosts();
+}
+
+function renderPosts() {
+  const el = document.getElementById('posts-list');
+  if (!allPosts.length) { el.innerHTML = '<div class="empty-state">No blog posts yet.</div>'; return; }
+  el.innerHTML = allPosts.map(p => {
+    const pub = p.published !== false;
+    return `
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <span class="card-title">${escHtml(p.title || p.filename)}</span>
+        <span class="card-meta">${escHtml(String(p.date || '').substring(0, 10))}</span>
+        ${pub ? '<span class="badge active">published</span>' : '<span class="badge">draft</span>'}
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input value="${escHtml(p.title || '')}" onblur="updatePost('${escJs(p.filename)}', 'title', this.value)"></div>
+          <div class="form-group"><label>Date</label><input value="${escHtml(String(p.date || '').substring(0, 16))}" onblur="updatePost('${escJs(p.filename)}', 'date', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Description</label><input value="${escHtml(p.description || '')}" onblur="updatePost('${escJs(p.filename)}', 'description', this.value)"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Tags</label><input value="${escHtml(p.tags || '')}" onblur="updatePost('${escJs(p.filename)}', 'tags', this.value)"></div>
+          <div class="form-group"><label>Categories</label><input value="${escHtml(p.categories || '')}" onblur="updatePost('${escJs(p.filename)}', 'categories', this.value)"></div>
+        </div>
+        <div class="form-group"><label class="toggle"><input type="checkbox" ${pub ? 'checked' : ''} onchange="updatePost('${escJs(p.filename)}', 'published', this.checked)"> Published</label></div>
+        <div class="form-group"><label>Body</label><textarea rows="10" onblur="updatePost('${escJs(p.filename)}', 'body', this.value)">${escHtml(p.body || '')}</textarea></div>
+        <div class="card-actions">
+          <button class="btn-sm btn-danger" onclick="deletePost('${escJs(p.filename)}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function createPost() {
+  const title = document.getElementById('new-title').value.trim();
+  const date = document.getElementById('new-date').value;
+  const description = document.getElementById('new-desc').value.trim();
+  const tags = document.getElementById('new-tags').value.trim();
+  const categories = document.getElementById('new-cats').value.trim();
+  const body = document.getElementById('new-body').value;
+  if (!title || !date) { showStatus('Title and date are required', 'error'); return; }
+  const res = await fetch('/api/posts', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, date, description, tags, categories, body, published: true}),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Post created', 'success');
+  ['new-title','new-date','new-desc','new-tags','new-cats','new-body'].forEach(id => document.getElementById(id).value = '');
+  await loadPosts();
+}
+
+async function updatePost(filename, field, value) {
+  const res = await fetch('/api/posts/' + encodeURIComponent(filename), {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else await loadPosts();
+}
+
+async function deletePost(filename) {
+  if (!confirm('Delete this blog post?')) return;
+  const res = await fetch('/api/posts/' + encodeURIComponent(filename), {method: 'DELETE'});
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Deleted', 'success');
+  await loadPosts();
+}
+
+loadPosts();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Projects Admin HTML
+# ---------------------------------------------------------------------------
+
+PROJECTS_HTML = make_page("Projects", "/projects", """
+<div class="add-form">
+  <h2>Add Project</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Title</label><input id="new-title" placeholder="My Project"></div>
+    <div class="form-group"><label>Category</label><input id="new-cat" placeholder="work"></div>
+    <div class="form-group"><label>Importance</label><input id="new-imp" type="number" value="1"></div>
+  </div>
+  <div class="form-group"><label>Description</label><input id="new-desc" placeholder="Brief description"></div>
+  <div class="form-group"><label>Body (Markdown)</label><textarea id="new-body" rows="4"></textarea></div>
+  <button class="btn-primary" onclick="createProject()">+ Add Project</button>
+</div>
+<div id="projects-list"></div>
+""", extra_js="""
+let allProjects = [];
+
+async function loadProjects() {
+  const res = await fetch('/api/projects');
+  allProjects = await res.json();
+  allProjects.sort((a, b) => (a.importance || 99) - (b.importance || 99));
+  renderProjects();
+}
+
+function renderProjects() {
+  const el = document.getElementById('projects-list');
+  if (!allProjects.length) { el.innerHTML = '<div class="empty-state">No projects yet.</div>'; return; }
+  el.innerHTML = allProjects.map(p => `
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        ${p.img ? '<img class="thumb" src="/' + escHtml(p.img) + '" onerror="this.style.display=\\'none\\'">' : ''}
+        <span class="card-title">${escHtml(p.title || p.filename)}</span>
+        <span class="badge">${escHtml(p.category || '')}</span>
+        <span class="card-meta">#${p.importance || '?'}</span>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input value="${escHtml(p.title || '')}" onblur="updateProject('${escJs(p.filename)}', 'title', this.value)"></div>
+          <div class="form-group"><label>Category</label><input value="${escHtml(p.category || '')}" onblur="updateProject('${escJs(p.filename)}', 'category', this.value)"></div>
+          <div class="form-group"><label>Importance</label><input type="number" value="${p.importance || ''}" onblur="updateProject('${escJs(p.filename)}', 'importance', parseInt(this.value))"></div>
+        </div>
+        <div class="form-group"><label>Description</label><input value="${escHtml(p.description || '')}" onblur="updateProject('${escJs(p.filename)}', 'description', this.value)"></div>
+        <div class="form-group"><label>Image path</label><input value="${escHtml(p.img || '')}" onblur="updateProject('${escJs(p.filename)}', 'img', this.value)"></div>
+        <div class="form-group"><label>Upload Image</label><input type="file" accept="image/*" onchange="uploadProjectImage(this.files[0], '${escJs(p.filename)}', this)"></div>
+        <div class="form-group"><label class="toggle"><input type="checkbox" ${p.related_publications ? 'checked' : ''} onchange="updateProject('${escJs(p.filename)}', 'related_publications', this.checked)"> Related publications</label></div>
+        <div class="form-group"><label>Body</label><textarea rows="8" onblur="updateProject('${escJs(p.filename)}', 'body', this.value)">${escHtml(p.body || '')}</textarea></div>
+        <div class="card-actions">
+          <button class="btn-sm btn-danger" onclick="deleteProject('${escJs(p.filename)}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function createProject() {
+  const title = document.getElementById('new-title').value.trim();
+  const category = document.getElementById('new-cat').value.trim();
+  const importance = parseInt(document.getElementById('new-imp').value) || 1;
+  const description = document.getElementById('new-desc').value.trim();
+  const body = document.getElementById('new-body').value;
+  if (!title) { showStatus('Title is required', 'error'); return; }
+  const res = await fetch('/api/projects', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, category, importance, description, body}),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Project created', 'success');
+  ['new-title','new-cat','new-desc','new-body'].forEach(id => document.getElementById(id).value = '');
+  await loadProjects();
+}
+
+async function updateProject(filename, field, value) {
+  const res = await fetch('/api/projects/' + encodeURIComponent(filename), {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else await loadProjects();
+}
+
+async function uploadProjectImage(file, filename, inputEl) {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/projects/upload-image', {method: 'POST', body: formData});
+  const d = await res.json();
+  if (inputEl) inputEl.value = '';
+  if (!res.ok) { showStatus(d.error || 'Upload failed', 'error'); return; }
+  await updateProject(filename, 'img', d.path);
+  showStatus('Image uploaded', 'success');
+}
+
+async function deleteProject(filename) {
+  if (!confirm('Delete this project?')) return;
+  const res = await fetch('/api/projects/' + encodeURIComponent(filename), {method: 'DELETE'});
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Deleted', 'success');
+  await loadProjects();
+}
+
+loadProjects();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Books Admin HTML
+# ---------------------------------------------------------------------------
+
+BOOKS_HTML = make_page("Books", "/books", """
+<div class="add-form">
+  <h2>Add Book Review</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Title</label><input id="new-title" placeholder="The Great Gatsby"></div>
+    <div class="form-group"><label>Author</label><input id="new-author" placeholder="F. Scott Fitzgerald"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Stars (1-5)</label><input id="new-stars" type="number" min="1" max="5"></div>
+    <div class="form-group"><label>Status</label><select id="new-status"><option>Reading</option><option>Finished</option><option>Abandoned</option></select></div>
+    <div class="form-group"><label>Released (year)</label><input id="new-released" type="number"></div>
+  </div>
+  <div class="form-group"><label>Body (Review markdown)</label><textarea id="new-body" rows="4"></textarea></div>
+  <button class="btn-primary" onclick="createBook()">+ Add Book</button>
+</div>
+<div id="books-list"></div>
+""", extra_js="""
+let allBooks = [];
+
+async function loadBooks() {
+  const res = await fetch('/api/books');
+  allBooks = await res.json();
+  renderBooks();
+}
+
+function starsHtml(n) { return '★'.repeat(n || 0) + '☆'.repeat(5 - (n || 0)); }
+
+function renderBooks() {
+  const el = document.getElementById('books-list');
+  if (!allBooks.length) { el.innerHTML = '<div class="empty-state">No book reviews yet.</div>'; return; }
+  el.innerHTML = allBooks.map(b => `
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        ${b.cover ? '<img class="thumb" src="/' + escHtml(b.cover) + '" onerror="this.style.display=\\'none\\'">' : ''}
+        <span class="card-title">${escHtml(b.title || b.filename)}</span>
+        <span class="card-meta">${escHtml(b.author || '')}</span>
+        <span class="card-meta" style="color:var(--accent)">${starsHtml(b.stars)}</span>
+        <span class="badge">${escHtml(b.status || '')}</span>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input value="${escHtml(b.title || '')}" onblur="updateBook('${escJs(b.filename)}', 'title', this.value)"></div>
+          <div class="form-group"><label>Author</label><input value="${escHtml(b.author || '')}" onblur="updateBook('${escJs(b.filename)}', 'author', this.value)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Stars</label><input type="number" min="1" max="5" value="${b.stars || ''}" onblur="updateBook('${escJs(b.filename)}', 'stars', parseInt(this.value))"></div>
+          <div class="form-group"><label>Status</label><select onchange="updateBook('${escJs(b.filename)}', 'status', this.value)">
+            <option ${b.status === 'Reading' ? 'selected' : ''}>Reading</option>
+            <option ${b.status === 'Finished' ? 'selected' : ''}>Finished</option>
+            <option ${b.status === 'Abandoned' ? 'selected' : ''}>Abandoned</option>
+          </select></div>
+          <div class="form-group"><label>Released</label><input type="number" value="${b.released || ''}" onblur="updateBook('${escJs(b.filename)}', 'released', this.value)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Started</label><input type="date" value="${escHtml(String(b.started || ''))}" onblur="updateBook('${escJs(b.filename)}', 'started', this.value)"></div>
+          <div class="form-group"><label>Finished</label><input type="date" value="${escHtml(String(b.finished || ''))}" onblur="updateBook('${escJs(b.filename)}', 'finished', this.value)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>ISBN</label><input value="${escHtml(b.isbn || '')}" onblur="updateBook('${escJs(b.filename)}', 'isbn', this.value)"></div>
+          <div class="form-group"><label>OLID</label><input value="${escHtml(b.olid || '')}" onblur="updateBook('${escJs(b.filename)}', 'olid', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Cover path</label><input value="${escHtml(b.cover || '')}" onblur="updateBook('${escJs(b.filename)}', 'cover', this.value)"></div>
+        <div class="form-group"><label>Upload Cover</label><input type="file" accept="image/*" onchange="uploadBookCover(this.files[0], '${escJs(b.filename)}', this)"></div>
+        <div class="form-group"><label>Buy Link</label><input value="${escHtml(b.buy_link || '')}" onblur="updateBook('${escJs(b.filename)}', 'buy_link', this.value)"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Categories</label><input value="${escHtml(b.categories || '')}" onblur="updateBook('${escJs(b.filename)}', 'categories', this.value)"></div>
+          <div class="form-group"><label>Tags</label><input value="${escHtml(b.tags || '')}" onblur="updateBook('${escJs(b.filename)}', 'tags', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Body</label><textarea rows="8" onblur="updateBook('${escJs(b.filename)}', 'body', this.value)">${escHtml(b.body || '')}</textarea></div>
+        <div class="card-actions">
+          <button class="btn-sm btn-danger" onclick="deleteBook('${escJs(b.filename)}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function createBook() {
+  const title = document.getElementById('new-title').value.trim();
+  const author = document.getElementById('new-author').value.trim();
+  const stars = parseInt(document.getElementById('new-stars').value) || '';
+  const status = document.getElementById('new-status').value;
+  const released = document.getElementById('new-released').value;
+  const body = document.getElementById('new-body').value;
+  if (!title) { showStatus('Title is required', 'error'); return; }
+  const res = await fetch('/api/books', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, author, stars, status, released, body}),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Book added', 'success');
+  ['new-title','new-author','new-stars','new-released','new-body'].forEach(id => document.getElementById(id).value = '');
+  await loadBooks();
+}
+
+async function updateBook(filename, field, value) {
+  const res = await fetch('/api/books/' + encodeURIComponent(filename), {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else await loadBooks();
+}
+
+async function uploadBookCover(file, filename, inputEl) {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/books/upload-cover', {method: 'POST', body: formData});
+  const d = await res.json();
+  if (inputEl) inputEl.value = '';
+  if (!res.ok) { showStatus(d.error || 'Upload failed', 'error'); return; }
+  await updateBook(filename, 'cover', d.path);
+  showStatus('Cover uploaded', 'success');
+}
+
+async function deleteBook(filename) {
+  if (!confirm('Delete this book review?')) return;
+  const res = await fetch('/api/books/' + encodeURIComponent(filename), {method: 'DELETE'});
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Deleted', 'success');
+  await loadBooks();
+}
+
+loadBooks();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Publications Admin HTML
+# ---------------------------------------------------------------------------
+
+PUBS_HTML = make_page("Publications", "/publications", """
+<div class="add-form">
+  <h2>Add Publication</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Citation Key</label><input id="new-key" placeholder="AuthorYear-xx"></div>
+    <div class="form-group"><label>Type</label><select id="new-type"><option value="article">Article</option><option value="inproceedings">Conference</option></select></div>
+    <div class="form-group"><label>Year</label><input id="new-year" type="number"></div>
+  </div>
+  <div class="form-group"><label>Title</label><input id="new-title"></div>
+  <div class="form-group"><label>Authors</label><input id="new-author" placeholder="Last, First and Last, First"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Journal / Booktitle</label><input id="new-venue"></div>
+    <div class="form-group"><label>URL</label><input id="new-url"></div>
+  </div>
+  <div class="form-group"><label>Abstract</label><textarea id="new-abstract" rows="3"></textarea></div>
+  <div class="form-group"><label class="toggle"><input type="checkbox" id="new-selected"> Selected (show on about page)</label></div>
+  <button class="btn-primary" onclick="createPub()">+ Add Publication</button>
+</div>
+<div id="pubs-list"></div>
+""", extra_css="""
+  .pub-preview { width: 60px; height: 60px; object-fit: contain; border-radius: 4px; background: var(--bg-card); }
+  .reorder-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .reorder-btns button { padding: 1px 6px; font-size: 0.6rem; line-height: 1; }
+""", extra_js="""
+let allPubs = [];
+
+async function loadPubs() {
+  const res = await fetch('/api/publications');
+  if (!res.ok) { const d = await res.json(); showStatus(d.error || 'Failed to load', 'error'); return; }
+  allPubs = await res.json();
+  renderPubs();
+}
+
+function renderPubs() {
+  const el = document.getElementById('pubs-list');
+  if (!allPubs.length) { el.innerHTML = '<div class="empty-state">No publications yet.</div>'; return; }
+  el.innerHTML = allPubs.map((p, i) => {
+    const sel = p.selected && (p.selected === 'true' || p.selected === '{true}' || p.selected === true);
+    return `
+    <div class="card" data-pub-key="${escHtml(p.key)}">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="reorder-btns" onclick="event.stopPropagation()">
+          <button class="btn-sm" ${i === 0 ? 'disabled' : ''} onclick="movePub(${i}, ${i - 1})" title="Move up">&#9650;</button>
+          <button class="btn-sm" ${i === allPubs.length - 1 ? 'disabled' : ''} onclick="movePub(${i}, ${i + 1})" title="Move down">&#9660;</button>
+        </div>
+        ${p.preview ? '<img class="pub-preview" src="/assets/img/publication_preview/' + escHtml(p.preview.replace(/[{}]/g, '')) + '">' : ''}
+        <div style="flex:1;min-width:0">
+          <span class="card-title" style="display:block">${escHtml(p.title || p.key)}</span>
+          <span class="card-meta">${escHtml(p.author ? p.author.substring(0, 80) : '')}</span>
+        </div>
+        <span class="card-meta">${escHtml(p.year || '')}</span>
+        ${sel ? '<span class="badge active">selected</span>' : ''}
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group"><label>Key</label><input value="${escHtml(p.key)}" disabled></div>
+          <div class="form-group"><label>Type</label><select onchange="updatePub('${escJs(p.key)}', 'entry_type', this.value)">
+            <option value="article" ${p.entry_type === 'article' ? 'selected' : ''}>Article</option>
+            <option value="inproceedings" ${p.entry_type === 'inproceedings' ? 'selected' : ''}>Conference</option>
+          </select></div>
+          <div class="form-group"><label>Year</label><input value="${escHtml(p.year || '')}" onblur="updatePub('${escJs(p.key)}', 'year', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Title</label><input value="${escHtml(p.title || '')}" onblur="updatePub('${escJs(p.key)}', 'title', this.value)"></div>
+        <div class="form-group"><label>Authors</label><input value="${escHtml(p.author || '')}" onblur="updatePub('${escJs(p.key)}', 'author', this.value)"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Journal</label><input value="${escHtml(p.journal || '')}" onblur="updatePub('${escJs(p.key)}', 'journal', this.value)"></div>
+          <div class="form-group"><label>Booktitle</label><input value="${escHtml(p.booktitle || '')}" onblur="updatePub('${escJs(p.key)}', 'booktitle', this.value)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>URL</label><input value="${escHtml(p.url || '')}" onblur="updatePub('${escJs(p.key)}', 'url', this.value)"></div>
+          <div class="form-group"><label>HTML</label><input value="${escHtml(p.html || '')}" onblur="updatePub('${escJs(p.key)}', 'html', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Abstract</label><textarea rows="4" onblur="updatePub('${escJs(p.key)}', 'abstract', this.value)">${escHtml(p.abstract || '')}</textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>PDF filename</label><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="${escHtml((p.pdf || '').replace(/[{}]/g, ''))}" onblur="updatePub('${escJs(p.key)}', 'pdf', this.value)">${p.pdf ? `<button class="btn-sm btn-danger" onclick="removePubFile('${escJs(p.key)}', 'pdf')" title="Remove PDF">✕</button>` : ''}</div></div>
+          <div class="form-group"><label>Preview filename</label><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="${escHtml((p.preview || '').replace(/[{}]/g, ''))}" onblur="updatePub('${escJs(p.key)}', 'preview', this.value)">${p.preview ? `<button class="btn-sm btn-danger" onclick="removePubFile('${escJs(p.key)}', 'preview')" title="Remove preview">✕</button>` : ''}</div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Upload Preview Image</label><input type="file" accept="image/*" onchange="uploadPubFile('${escJs(p.key)}', 'preview', this.files[0], this)"></div>
+          <div class="form-group"><label>Upload PDF</label><input type="file" accept=".pdf" onchange="uploadPubFile('${escJs(p.key)}', 'pdf', this.files[0], this)"></div>
+        </div>
+        <div class="form-group"><label class="toggle"><input type="checkbox" ${sel ? 'checked' : ''} onchange="updatePub('${escJs(p.key)}', 'selected', this.checked ? 'true' : '')"> Selected (show on about page)</label></div>
+        <div class="card-actions">
+          <button class="btn-sm btn-danger" onclick="deletePub('${escJs(p.key)}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function createPub() {
+  const key = document.getElementById('new-key').value.trim();
+  const entry_type = document.getElementById('new-type').value;
+  const year = document.getElementById('new-year').value;
+  const title = document.getElementById('new-title').value.trim();
+  const author = document.getElementById('new-author').value.trim();
+  const venue = document.getElementById('new-venue').value.trim();
+  const url = document.getElementById('new-url').value.trim();
+  const abstract = document.getElementById('new-abstract').value.trim();
+  const selected = document.getElementById('new-selected').checked;
+  if (!key) { showStatus('Citation key is required', 'error'); return; }
+  const data = {key, entry_type, year, title, author, abstract, url, html: url};
+  if (entry_type === 'article') data.journal = venue;
+  else data.booktitle = venue;
+  if (selected) data.selected = 'true';
+  const res = await fetch('/api/publications', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Publication added', 'success');
+  ['new-key','new-year','new-title','new-author','new-venue','new-url','new-abstract'].forEach(id => document.getElementById(id).value = '');
+  await loadPubs();
+}
+
+async function updatePub(key, field, value) {
+  const res = await fetch('/api/publications/' + encodeURIComponent(key), {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else await loadPubs();
+}
+
+async function uploadPubFile(key, type, file, inputEl) {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/publications/' + encodeURIComponent(key) + '/' + type, {method: 'POST', body: formData});
+  const d = await res.json();
+  if (inputEl) inputEl.value = '';
+  if (!res.ok) { showStatus(d.error || 'Upload failed', 'error'); return; }
+  showStatus(type + ' uploaded', 'success');
+  await loadPubs();
+}
+
+async function removePubFile(key, field) {
+  if (!confirm('Remove ' + field + ' from this publication?')) return;
+  await updatePub(key, field, '');
+  showStatus(field + ' removed', 'success');
+  await loadPubs();
+}
+
+async function deletePub(key) {
+  if (!confirm('Delete this publication?')) return;
+  const res = await fetch('/api/publications/' + encodeURIComponent(key), {method: 'DELETE'});
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed', 'error'); return; }
+  showStatus('Deleted', 'success');
+  await loadPubs();
+}
+
+async function movePub(fromIdx, toIdx) {
+  if (toIdx < 0 || toIdx >= allPubs.length) return;
+  const item = allPubs.splice(fromIdx, 1)[0];
+  allPubs.splice(toIdx, 0, item);
+  renderPubs();
+  const keys = allPubs.map(p => p.key);
+  const res = await fetch('/api/publications/reorder', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({keys}),
+  });
+  const d = await res.json();
+  if (!res.ok) { showStatus(d.error || 'Failed to reorder', 'error'); await loadPubs(); }
+}
+
+loadPubs();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Site Settings Admin HTML
+# ---------------------------------------------------------------------------
+
+SETTINGS_HTML = make_page("Site Settings", "/settings", """
+<div class="section-title">Site Identity</div>
+<div class="add-form" id="site-form">
+  <div class="form-row">
+    <div class="form-group"><label>First Name</label><input id="cfg-first_name"></div>
+    <div class="form-group"><label>Middle Name</label><input id="cfg-middle_name"></div>
+    <div class="form-group"><label>Last Name</label><input id="cfg-last_name"></div>
+  </div>
+  <div class="form-group"><label>Site Title</label><input id="cfg-title"></div>
+  <div class="form-group"><label>Description</label><textarea id="cfg-description" rows="2"></textarea></div>
+  <div class="form-group"><label>Footer Text</label><textarea id="cfg-footer_text" rows="2"></textarea></div>
+  <button class="btn-primary" onclick="saveSiteConfig()">Save Site Config</button>
+</div>
+
+<div class="section-title">About Page</div>
+<div class="add-form" id="about-form">
+  <div class="form-group"><label>Subtitle</label><input id="about-subtitle"></div>
+  <div class="form-group"><label>Profile Photo</label>
+    <div style="display:flex;gap:12px;align-items:center">
+      <img id="profile-preview" src="/assets/img/prof_pic.jpg" style="width:80px;height:80px;border-radius:8px;object-fit:cover;background:var(--border)">
+      <input type="file" accept="image/*" onchange="uploadProfilePhoto(this.files[0], this)">
+    </div>
+  </div>
+  <div class="form-group"><label>Bio (Markdown body)</label><textarea id="about-body" rows="6"></textarea></div>
+  <button class="btn-primary" onclick="saveAbout()">Save About Page</button>
+</div>
+
+<div class="section-title">Social Links</div>
+<div class="add-form" id="socials-form">
+  <div id="socials-list"></div>
+  <button class="btn-primary" onclick="saveSocials()" style="margin-top:10px">Save Social Links</button>
+</div>
+""", extra_css="""
+  .social-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .social-row label { font-size: 0.8rem; color: var(--text-muted); width: 160px; flex-shrink: 0; }
+  .social-row input[type="text"] { flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; color: var(--text); font-size: 0.82rem; outline: none; }
+  .social-row input[type="text"]:focus { border-color: var(--accent); }
+  .social-row input[type="checkbox"] { width: auto; }
+""", extra_js="""
+let siteConfig = {};
+let aboutData = {};
+let socialsData = {};
+
+async function loadSettings() {
+  const [siteRes, aboutRes, socialsRes] = await Promise.all([
+    fetch('/api/settings/site'),
+    fetch('/api/settings/about'),
+    fetch('/api/settings/socials'),
+  ]);
+  siteConfig = await siteRes.json();
+  aboutData = await aboutRes.json();
+  socialsData = await socialsRes.json();
+  renderSettings();
+}
+
+function renderSettings() {
+  // Site config
+  for (const key of ['first_name', 'middle_name', 'last_name', 'title', 'description', 'footer_text']) {
+    const el = document.getElementById('cfg-' + key);
+    if (el) el.value = siteConfig[key] || '';
+  }
+  // About
+  document.getElementById('about-subtitle').value = aboutData.subtitle || '';
+  document.getElementById('about-body').value = aboutData.body || '';
+  // Socials
+  const el = document.getElementById('socials-list');
+  const keys = Object.keys(socialsData).sort();
+  el.innerHTML = keys.map(key => {
+    const s = socialsData[key];
+    return `<div class="social-row">
+      <input type="checkbox" data-key="${escHtml(key)}" ${s.enabled ? 'checked' : ''}>
+      <label>${escHtml(key)}</label>
+      <input type="text" data-key="${escHtml(key)}" value="${escHtml(s.value || s.comment_value || '')}">
+    </div>`;
+  }).join('');
+}
+
+async function saveSiteConfig() {
+  const data = {};
+  for (const key of ['first_name', 'middle_name', 'last_name', 'title', 'description', 'footer_text']) {
+    data[key] = document.getElementById('cfg-' + key).value;
+  }
+  const res = await fetch('/api/settings/site', {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else showStatus('Site config saved', 'success');
+}
+
+async function saveAbout() {
+  const subtitle = document.getElementById('about-subtitle').value;
+  const body = document.getElementById('about-body').value;
+  const res = await fetch('/api/settings/about', {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({subtitle, body}),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else showStatus('About page saved', 'success');
+}
+
+async function uploadProfilePhoto(file, inputEl) {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/settings/profile-photo', {method: 'POST', body: formData});
+  const d = await res.json();
+  if (inputEl) inputEl.value = '';
+  if (!res.ok) { showStatus(d.error || 'Upload failed', 'error'); return; }
+  document.getElementById('profile-preview').src = '/assets/img/prof_pic.jpg?' + Date.now();
+  showStatus('Profile photo updated', 'success');
+}
+
+async function saveSocials() {
+  const data = {};
+  const checkboxes = document.querySelectorAll('#socials-list input[type="checkbox"]');
+  checkboxes.forEach(cb => {
+    const key = cb.dataset.key;
+    const input = document.querySelector('#socials-list input[type="text"][data-key="' + key + '"]');
+    data[key] = {
+      value: input ? input.value : '',
+      enabled: cb.checked,
+      comment_value: input ? input.value : '',
+    };
+  });
+  const res = await fetch('/api/settings/socials', {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+  });
+  const d = await res.json();
+  if (!res.ok) showStatus(d.error || 'Failed', 'error');
+  else showStatus('Social links saved', 'success');
+}
+
+loadSettings();
+""")
+
+
+# ---------------------------------------------------------------------------
+# Route handlers
+# ---------------------------------------------------------------------------
+
 @app.route("/photos")
 def photos_admin():
     return Response(PHOTOS_HTML, mimetype="text/html")
+
+
+@app.route("/news")
+def news_admin():
+    return Response(NEWS_HTML, mimetype="text/html")
+
+
+@app.route("/blog")
+def blog_admin():
+    return Response(BLOG_HTML, mimetype="text/html")
+
+
+@app.route("/projects")
+def projects_admin():
+    return Response(PROJECTS_HTML, mimetype="text/html")
+
+
+@app.route("/books")
+def books_admin():
+    return Response(BOOKS_HTML, mimetype="text/html")
+
+
+@app.route("/publications")
+def pubs_admin():
+    return Response(PUBS_HTML, mimetype="text/html")
+
+
+@app.route("/settings")
+def settings_admin():
+    return Response(SETTINGS_HTML, mimetype="text/html")
 
 
 @app.route("/")
@@ -1863,11 +3333,11 @@ def index():
     return Response(HTML, mimetype="text/html")
 
 
-# Serve local album cover images so the table can show thumbnails
-@app.route("/assets/img/albums I like/<path:filename>")
-def serve_cover(filename):
+# Serve local assets (album covers, publication previews, project images, etc.)
+@app.route("/assets/<path:filepath>")
+def serve_assets(filepath):
     from flask import send_from_directory
-    return send_from_directory(COVERS_DIR, filename)
+    return send_from_directory(REPO_ROOT / "assets", filepath)
 
 
 # ---------------------------------------------------------------------------
@@ -1876,7 +3346,7 @@ def serve_cover(filename):
 if __name__ == "__main__":
     PORT = 5001
     url = f"http://localhost:{PORT}"
-    print(f"\nAlbums Admin running at {url}\n")
+    print(f"\nAdmin Server running at {url}\n")
     # Open browser after a short delay so the server is ready
     threading.Timer(1.0, lambda: webbrowser.open(url)).start()
     app.run(host="127.0.0.1", port=PORT, debug=False)
