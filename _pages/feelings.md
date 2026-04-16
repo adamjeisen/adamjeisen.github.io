@@ -187,12 +187,26 @@ description: my attempts to visually and sonically capture my feelings & experie
 /* Responsive */
 @media (max-width: 768px) {
   .tis-photo-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
   }
 }
 @media (max-width: 480px) {
+  /* 6-col underlying grid; items span 2 by default = 3 per row */
   .tis-photo-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+  }
+  .tis-photo-item {
+    grid-column: span 2;
+  }
+  /* n % 3 == 2: last child at position 3k+2 → expand last 2 (span 3 each, one row of 2) */
+  .tis-photo-grid:has(> .tis-photo-item:last-child:nth-child(3n+2)) > .tis-photo-item:nth-last-child(-n+2) {
+    grid-column: span 3;
+  }
+  /* n % 3 == 1 and n >= 4: last child at 3k+1 → expand last 4 (two rows of 2) */
+  .tis-photo-grid:has(> .tis-photo-item:last-child:nth-child(3n+1)):has(> .tis-photo-item:nth-child(4)) > .tis-photo-item:nth-last-child(-n+4) {
+    grid-column: span 3;
   }
 }
 </style>
