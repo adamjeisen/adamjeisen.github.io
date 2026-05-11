@@ -8,7 +8,11 @@
       "Bash(git push:*)",
       "Bash(.venv/bin/python3 -c ':*)",
       "Bash(../.venv/bin/python3 -c \"from admin_helpers import read_bib, write_bib, slugify; print\\('OK'\\)\")",
-      "Bash(ipconfig getifaddr:*)"
+      "Bash(ipconfig getifaddr:*)",
+      "Bash(gh run *)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/python3 -c ' *)",
+      "Bash(.venv/bin/python3 -m pip install Pillow -q)"
     ]
   }
 }
