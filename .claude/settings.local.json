@@ -12,7 +12,8 @@
       "Bash(gh run *)",
       "Bash(.venv/bin/pip install *)",
       "Bash(.venv/bin/python3 -c ' *)",
-      "Bash(.venv/bin/python3 -m pip install Pillow -q)"
+      "Bash(.venv/bin/python3 -m pip install Pillow -q)",
+      "Bash(git add *)"
     ]
   }
 }
