@@ -9,4 +9,5 @@ dependencies = [
     "requests",
     "spotipy",
     "cloudinary",
+    "pyyaml>=6.0.3",
 ]

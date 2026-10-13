@@ -1,5 +1,829 @@
 [
   {
+    "id": "2026-08",
+    "month_label": "August 2026",
+    "description": "getting to know SF, plus a bit of tampa",
+    "playlist_url": "https://open.spotify.com/playlist/29J21Q3RFWtA8K7jHhHJbt?si=7c8e512f383f493d",
+    "events": [
+      {
+        "id": "event-mv69o3wo",
+        "title": "",
+        "photos": [
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871063/things-i-saw/tzq4rg9fvba0tkmpliu4.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:31 19:15:51",
+            "hash": "3af6d26b87234b1e00cdf4ca88c646a9"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871062/things-i-saw/k1pjixarzedklwnreyvl.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:31 19:13:57",
+            "hash": "b9cb637cac876bb003f21bdc555809da"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871060/things-i-saw/jiy8tphupvsd6fpyuglq.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:30 15:38:40",
+            "hash": "fde1392a1a9f43c693ef264a681eb8bb"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871058/things-i-saw/u8rxaye62iy7uqx9ouyc.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:30 15:23:11",
+            "hash": "0e6bc5a95158fd80fc5e3453626f82e2"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871056/things-i-saw/wu9e7ihqt98g8cqtnnjd.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:30 00:20:09",
+            "hash": "137e20b3b2b815e2c32cc2e9665a4162"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871055/things-i-saw/jml0mzlr9orada9j5cbw.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:29 11:08:40",
+            "hash": "0c232baef2eabf2b0a538d92bda40feb"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871053/things-i-saw/u98tzigfvuoiyvzyxwgw.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:28 22:06:16",
+            "hash": "e6c7c5872320a426d06f3ff4fc4381ab"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871052/things-i-saw/k3mdbgbamqjqxt5germ0.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:27 20:49:01",
+            "hash": "f820a4b36881a31a500055eebaefd9db"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871051/things-i-saw/lnu6m45cg6ibkulyhglc.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:24 19:48:56",
+            "hash": "efbfe9b684ec3b0bc06aa6e053b02d30"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871049/things-i-saw/qjqdh9yl7kj3ir2usgoh.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:24 00:00:21",
+            "hash": "d9e0ee42e446b45a2467d5b4581ea767"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871048/things-i-saw/fvk4ljdhainbseqq0tfq.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:22 21:32:09",
+            "hash": "c7f237c35e800efe7c74a417455a854c"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871046/things-i-saw/iwkl3aacxoikuyu0y9qc.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:22 12:46:03",
+            "hash": "344a363ead375542635563192a7069cf"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871045/things-i-saw/cwuxlzd07cb8q6crjglp.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:21 18:20:07",
+            "hash": "1aa92db30828fb70ffaa1bba05184b70"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871043/things-i-saw/m6lco0y0wxiggu8cpqsb.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:21 17:42:57",
+            "hash": "ffb7811369c6a830365335e3420ade10"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871041/things-i-saw/kieic05lw8puu6xg9oxs.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:21 17:19:43",
+            "hash": "8672fc2661e4ebba26ca797d86afe3e3"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871039/things-i-saw/vjara71dbjbkizuv3vb8.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:18 20:31:31",
+            "hash": "9947293440e331118491a669ead6a932"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871037/things-i-saw/qaglyfsvkk8grwzsaq9g.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:18 20:30:13",
+            "hash": "9eb5937b92e5af10fdcf495a9e54b07c"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871036/things-i-saw/ml04oeg5y81n3tqlmaf1.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:18 20:02:38",
+            "hash": "4ced9799c3cc73662db674ab1e4abe00"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871034/things-i-saw/cdnq6bam7ebjzgnwmg62.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:16 19:21:44",
+            "hash": "a9a27741116b4dbb01e41f7c79d4d4af"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871032/things-i-saw/yxnggs6ytph6phym30yj.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:16 18:47:21",
+            "hash": "a32bbae85f9f0943c2228b24a3b58548"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871031/things-i-saw/heig96uavwr0z0b2ysew.jpg",
+            "caption": "",
+            "width": 3024,
+            "height": 4032,
+            "orientation": "portrait",
+            "date_taken": "2026:08:16 16:38:03",
+            "hash": "466336658bbe69959e2495584b91d3fa"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871029/things-i-saw/ixjxvrhrz2zkwdy9xlrp.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:16 16:32:25",
+            "hash": "ce49aea3b5f9daab05efd9f874a87db6"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871028/things-i-saw/wzrhszbxtygjcjdk1okf.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:16 16:09:34",
+            "hash": "40a0799b0bb1687187a0db0ed1a0e5ce"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871026/things-i-saw/ve0ekcy6itgs5t4grzyi.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 22:45:36",
+            "hash": "ab8eb18b8556dfb23829cf3e86539de4"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871024/things-i-saw/hnjji1xoqel5x1inifyj.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 15:12:47",
+            "hash": "6857fa6491ecd49eeedaaa461525a436"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871023/things-i-saw/ib9ngf6rta7zparsxtvb.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 15:06:25",
+            "hash": "ee67a5f37b7036c03b659084376a85e3"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871021/things-i-saw/teivzxyaqstzgvalzzl8.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 14:58:40",
+            "hash": "e5c84a9e11a3e9dcbbc54fef8755e09f"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871020/things-i-saw/sv1ie5wekogdmasskixd.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 14:56:49",
+            "hash": "805c6f5487566da40756e67a4ae67afc"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871018/things-i-saw/dg4ahhqcomb2lkz0hehu.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:15 13:14:28",
+            "hash": "40f5ea008a3cc4ab10da7864247e00d0"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871016/things-i-saw/uf4goiqdepsj8dfzlb6j.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:14 23:35:57",
+            "hash": "5f21deea54e09b318eea9f38431720c9"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871014/things-i-saw/hwq1de5xbafulre64aei.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:14 22:53:52",
+            "hash": "4b4a14d0f8ee85d27659fe983894890f"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871012/things-i-saw/l0u3wtl6gzo77aj9izm3.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:14 22:18:36",
+            "hash": "7ef4dea11df67b492fd148d98767c3ed"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871011/things-i-saw/x6xrvbqyitktgvalwgyl.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:14 20:21:31",
+            "hash": "9c2fa9e4d5759878f823c8c75bb4905d"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871010/things-i-saw/oqhp3ycb7pd2em3reiqz.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:13 21:21:10",
+            "hash": "0a943ac11b18744124783785091c4bfd"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871008/things-i-saw/hmt3jguc0gurqqmdw1q2.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:13 20:49:17",
+            "hash": "c1bf155f4a080e54343a5ea1c71fc1d6"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871006/things-i-saw/k1hdsapsxnxebd8nx6lg.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:11 21:11:58",
+            "hash": "3b2c9ce7bb37b075a11b8856eff14be3"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871004/things-i-saw/iozvikjkbewnavqhwylf.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:11 20:02:15",
+            "hash": "4c32535063fad1a2305ca47164613df8"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871002/things-i-saw/yenuron3f0xh3gcf32zy.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:11 19:22:49",
+            "hash": "59ceb82aa293a18d222cbc039c68cb35"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791871000/things-i-saw/fttyzwflnvz9cnxetx0s.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:11 19:01:24",
+            "hash": "ae3791a03009b606c7a7af6db67215ab"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870998/things-i-saw/r3nt6fhzqjem2y8pgjao.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:10 00:23:24",
+            "hash": "f9339b42f0a8542c477fe14faa8523ef"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870996/things-i-saw/akasney86ih2uvg1esgl.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:09 21:30:56",
+            "hash": "77d16dfd9094f6f893a8f88c12a0c2ca"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870995/things-i-saw/jndeukrv3p0bzsk8bjdr.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:09 16:09:01",
+            "hash": "f4875b8680e8932f8dc06a9dd810c83c"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870993/things-i-saw/tc5t5fi5zremedrf39nq.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 23:47:35",
+            "hash": "7af5bb03a3fb25b2292a805a5a3c4256"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870992/things-i-saw/iy4abr3suk1yvhhpozmm.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 23:42:12",
+            "hash": "f65d85ef906c1e9880520525befeeab8"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870990/things-i-saw/vzgb9zei0degr9zrltkh.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 22:11:32",
+            "hash": "881980e8028154108d9cd8b2efd66672"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870988/things-i-saw/ixlffe5vxp40hhw8iya0.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 19:29:39",
+            "hash": "6eb20b728e6a23f98d04f0f0b4c31b7a"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870987/things-i-saw/cebpxjtcjgyvaqukwwc8.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 18:11:32",
+            "hash": "88fa89511c34eb8ce823dd560bdfb24e"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870986/things-i-saw/vla2k0hphujmbzdjcjgu.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 17:55:06",
+            "hash": "5578ccd08608cd0de597b5b2cd35eca4"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870984/things-i-saw/ik1i1od9okb9j1zvgdvv.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 16:28:59",
+            "hash": "e7845f319a97b14093b896f71d0c09f0"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870982/things-i-saw/snlvtzgayjjixiktybvp.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 14:55:08",
+            "hash": "c40f9c9d30ec525cd574193e6cf58ced"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870980/things-i-saw/v7qh1ijtmb9covhsqrxl.jpg",
+            "caption": "",
+            "width": 3024,
+            "height": 4032,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 14:35:01",
+            "hash": "502ca4f7257c2050c8283283b111376a"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870979/things-i-saw/vhfxdklh31hmkofdr9s0.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 13:22:47",
+            "hash": "e70cee55ff54547ad573b16586991b41"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870978/things-i-saw/dao58vtdjbmxzllsrrim.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 13:22:41",
+            "hash": "9944b56d5ff69116d5add5c7bf0560d0"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870976/things-i-saw/ooxqxbqvdvormoeziszw.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 13:12:06",
+            "hash": "62e7b7b5195242867edd0a3204d2d3ab"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870975/things-i-saw/babpuquxarr8u6o7sh5r.jpg",
+            "caption": "",
+            "width": 3024,
+            "height": 4032,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 13:01:18",
+            "hash": "1ca404c422278d7e132b9cae201c7011"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870973/things-i-saw/ft272qkbybcdsb1gjz0s.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 12:55:09",
+            "hash": "b3f7434aef53f973a5c7e3f1c518af24"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870972/things-i-saw/pfntpqbzuviut1irtnxv.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 12:46:12",
+            "hash": "88f63f16aac6e7d2318253f47fcca143"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870970/things-i-saw/i7kh2lluziwqpcsis5jd.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 12:23:49",
+            "hash": "0511b09a13baf203638487e53e1f304c"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870968/things-i-saw/y2wjbqupb330fqeodupo.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:08 12:17:21",
+            "hash": "5ed12380cba6a723d55cc90a0e1300c0"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870966/things-i-saw/v9xlvld99wc7awsllnbc.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:08 12:12:07",
+            "hash": "47d65d5fdfb9f01b9e6c2ac079aaf130"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870965/things-i-saw/j57imli8nz0hegiyo4b3.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:06 19:12:07",
+            "hash": "6be5a5172ce95aa5c7aff2086112363e"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870963/things-i-saw/tqelummt0kqkpprhkv5j.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:06 19:01:55",
+            "hash": "9f3187392cda4621fbefdfded9037242"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870961/things-i-saw/wskoquh5b0b3e0ic1u92.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:05 18:15:19",
+            "hash": "8cd3d8140fd97193a2037373fb8d5496"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870959/things-i-saw/vyrng01jduhpgdbgr8tf.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:02 20:43:33",
+            "hash": "f1b957aa580ee7dd89acd2aa702ea061"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870958/things-i-saw/fvtamgnvuobqzzti2h6w.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 19:51:29",
+            "hash": "10249f0208b53cb078a9ca1102e9c168"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870956/things-i-saw/yfuzsdsnxoytkmi679hr.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 16:44:38",
+            "hash": "9a4a576fc430a40bd18797f0eac8b4e1"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870955/things-i-saw/cz4t6u68o3pq8lx7zzyz.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 15:32:15",
+            "hash": "8752b2fa1f477218c6656efc9e8056dc"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870953/things-i-saw/xinnwo8ku5v77wdsdbqj.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 13:57:45",
+            "hash": "c1dad794b252da5d99bf2ea56775f50f"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870952/things-i-saw/d4suw0haso10konmoqhb.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 13:55:58",
+            "hash": "999a3e6d3c15e1662fd635ab98c6c9c1"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870950/things-i-saw/dwiychh56wjvasuhvqz2.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 13:51:42",
+            "hash": "745e3dbb8f7dda45d72102949a4700eb"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870948/things-i-saw/ispyhgu43hm2n7nou1xo.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:02 13:49:00",
+            "hash": "74596f86bed0951d7332dda3dfaf7367"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870946/things-i-saw/vd84cumpmqblhxhktcqh.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 22:14:34",
+            "hash": "3d575ea5412a6ca22145f9d56618bf08"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870944/things-i-saw/wrd95vivkxbs7hbrkzu9.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 20:57:45",
+            "hash": "152ccb1de49a33565451bf13fa8e8a3f"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870942/things-i-saw/rxttzrfrbbdax3esgcrj.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 20:42:49",
+            "hash": "7dc33d4126a51f2d15e0b2587353f3f2"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870940/things-i-saw/edxd4uikpu2ldtb7dg3i.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 18:58:28",
+            "hash": "6e40d2d184a26f119849f4639d1ebd85"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870937/things-i-saw/phyzdrwylvdjaxxdbh57.jpg",
+            "caption": "",
+            "width": 4284,
+            "height": 5712,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 18:04:41",
+            "hash": "696ac8d37bd2baaf94041fd5327c04a8"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870933/things-i-saw/gzs7cjrijfdtafagfy0j.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:51:02",
+            "hash": "cb4e7aa94e07f408b506b1c455bbf9a4"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870931/things-i-saw/ibhnzjdv20xssk1pzwkc.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:49:35",
+            "hash": "1740578613c3dcfa33fa9389fbba2994"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870928/things-i-saw/hxzxkgyv3emmtrhwrpv8.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:39:55",
+            "hash": "740f6f7a68356619c8b80b4570004183"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870926/things-i-saw/wfnjhgcw6qh6l77xabbh.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:31:14",
+            "hash": "d79d78e6b1a73d7cf4e521183eb249f0"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870923/things-i-saw/sjmbcwngg81xosdckf9c.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:22:43",
+            "hash": "25b56c4d41be54e618d3bbdffcbe921f"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870920/things-i-saw/mbbfgbhvtsxcfrpvqkfc.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:01 17:21:27",
+            "hash": "876ab0a97fc8f7d1b3d157efb76e6a55"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870918/things-i-saw/j2ozoctanncomt9wavzx.jpg",
+            "caption": "",
+            "width": 4284,
+            "height": 5712,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:13:45",
+            "hash": "cc8fb7e8a1103db656373ec465fdbfb4"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870916/things-i-saw/goxhisns05x2b5sonsp6.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:02:08",
+            "hash": "dd499a67add6797d2d9faf6ea800ef72"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870914/things-i-saw/bcwsyoy9vsbtvltogwpl.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 17:02:05",
+            "hash": "32febc191358e6bb5d6e6d59790525d5"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870912/things-i-saw/jeyjcptowtzjds1eo7k5.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 16:53:14",
+            "hash": "d03e7e970e329c249065719ce1407d41"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870910/things-i-saw/ldkikpskciapm6wqxify.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 16:52:31",
+            "hash": "8808b03f74d820b0b8ea36a103046c35"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870908/things-i-saw/cyk9x5zmxtcwtccphvqb.jpg",
+            "caption": "",
+            "width": 4283,
+            "height": 5711,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 16:42:20",
+            "hash": "60967936c0c3cb53e684caf0f495a0db"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870906/things-i-saw/mo8qvilmztyptbt37hvv.jpg",
+            "caption": "",
+            "width": 4284,
+            "height": 5712,
+            "orientation": "portrait",
+            "date_taken": "2026:08:01 16:40:47",
+            "hash": "71255c49084d4c7f1621c1abb41ae961"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870904/things-i-saw/sonwuovx1i12vmw0udkr.jpg",
+            "caption": "",
+            "width": 4012,
+            "height": 3004,
+            "orientation": "landscape",
+            "date_taken": "2026:08:01 13:39:51",
+            "hash": "4fdfe96deb27b493763540b64d3c0201"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "2026-07",
     "month_label": "July 2026",
     "description": "hanging in florida and getting settled in SF",
@@ -10,15 +834,6 @@
         "title": "",
         "photos": [
           {
-            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1786948154/things-i-saw/ykgi21lp60beuggvu3ws.jpg",
-            "caption": "",
-            "width": 4012,
-            "height": 3004,
-            "orientation": "landscape",
-            "date_taken": "2026:08:01 13:39:51",
-            "hash": "4fdfe96deb27b493763540b64d3c0201"
-          },
-          {
             "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1786948153/things-i-saw/m6eh45rgxcheumjirnm7.jpg",
             "caption": "",
             "width": 3004,
@@ -26,6 +841,15 @@
             "orientation": "portrait",
             "date_taken": "2026:07:31 20:07:21",
             "hash": "b488fca2bc9849101bb2cb149f593d79"
+          },
+          {
+            "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1791870791/things-i-saw/v335z53rrb8qsjv3sat1.jpg",
+            "caption": "",
+            "width": 3004,
+            "height": 4012,
+            "orientation": "portrait",
+            "date_taken": "2026:07:31 20:07:16",
+            "hash": "41ba03f1c6b2936ee1282500eb7f84f0"
           },
           {
             "url": "https://res.cloudinary.com/dpxqdgavv/image/upload/v1786948151/things-i-saw/hwhcx5zksqzvfa7vtmbc.jpg",
