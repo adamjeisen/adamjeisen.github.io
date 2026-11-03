@@ -25,85 +25,89 @@ matches the observed ~720 KB/request.
 
 ## 2. What changed
 
-- `_config.yml` → `feelings_images`:
-  - `thumb_transform: w_400,h_400,c_fill,g_auto,q_auto,f_auto`. This is the same string as before, so the
-    thumbnails Cloudinary has already derived stay valid and nothing is re-generated. Under strict mode
-    it must be marked *allowed for strict* (see the setup script). To use the named transformation
-    instead, set it to `t_feelings_thumb`. Every thumbnail would then be re-derived once, on first
-    request, at roughly 1 credit per 1,000 images per output format.
-  - `large_transform: t_feelings_large`: used by the lightbox and the click-through link.
-  - `large_max_px: 1600` **must equal** the limit in the `t_feelings_large` definition. The template
-    uses it to scale `data-pswp-width/height`, keeping the aspect ratio and long side ≤ 1600 px.
-- `_pages/feelings.md`: **the page never links to an untransformed original any more.** This was checked
-  by rendering the page with Liquid 4.0.4: 8,250 Cloudinary URLs, 0 untransformed.
-- `scripts/admin_server.py`: admin thumbnails use the same approved thumbnail transformation.
+**Every image URL on the page is now a signed, transformed URL.** The untransformed original is never
+requested.
+
+Cloudinary's docs settled the design. On *Restricted media types* the security FAQ
+(`developer_onboarding_faq_account_security`) says: "if you select any of these features or delivery
+types, then those types of URLs can be delivered only as signed URLs or if they are pre-generated as
+eager transformations." Ticking **Uploaded** therefore blocks *every* unsigned `/image/upload/` URL,
+thumbnails and lightbox images included, not just originals. Marking transformations "allowed for
+strict" is not enough to survive that setting. Signed URLs satisfy both Strict transformations and
+the restricted "Uploaded" type. (Named transformations were dropped: they add nothing once URLs are
+signed, and the docs say `f_auto` can't be used inside a named transformation.)
+
+- `_config.yml` → `feelings_images` (the single source of truth):
+  - `thumb_transform: w_400,h_400,c_fill,g_auto,q_auto,f_auto`. This is the grid thumbnail. It is the
+    same string as before, so already-generated thumbnails should be reused.
+  - `large_transform: c_limit,w_2560,h_2560,q_auto,f_auto`. This is the lightbox and click-through
+    image. It caps the long side at 2560 px and never upscales.
+  - `large_max_px: 2560` must match the `w_`/`h_` values above; the scripts refuse to run otherwise.
+    The template uses it to compute the lightbox dimensions.
+- `_data/feelings.json`: each photo gets `thumb_url` and `large_url`, the signed URLs, written by
+  `scripts/cloudinary_sign_urls.py`. A signature is computed with the API secret, but the signature
+  itself is not secret. It authorises only that exact transformation of that image, so it is safe to
+  commit and publish. Changing a transformation string means re-running the script.
+- `_pages/feelings.md`: uses the signed URLs. It falls back to unsigned transformed URLs for unsigned
+  photos, which only works until "Uploaded" is restricted. The page was checked by rendering it with
+  Liquid 4.0.4: 8,250 Cloudinary URLs, 0 originals, all lightbox dimensions correct, both with signed
+  data and with unsigned fallback data.
+- `scripts/admin_server.py`: new uploads are signed automatically. Admin thumbnails use the signed URL.
 - `robots.txt`: disallows AI-training and dataset crawlers (Reflectionbot, GPTBot, CCBot, ClaudeBot,
   Bytespider, Google-Extended, …). Normal search engines are unchanged. This only affects discovery
-  *through adamjeisen.com*. It does nothing about image URLs already harvested from
-  `res.cloudinary.com`, and only compliant bots obey it.
-- `_config.yml` `exclude`: `scripts/`, `pyproject.toml`, `uv.lock` and `requirements.txt` are no longer
-  published to the live site. Before this change, `scripts/*.py` was being served publicly.
+  *through adamjeisen.com*, not URLs already harvested from `res.cloudinary.com`.
+- `_config.yml` `exclude`: `scripts/` and the Python project files are no longer published to the
+  live site.
 
-### Named transformations to create
+Measured sizes (3 large photos, 3–6k px, Nov 2026; a small sample):
 
-Create these in the console under Transformations → Named transformations, or run
-`scripts/cloudinary_setup_transforms.py --apply`, which also sets the strict flag:
+| Version | Average size |
+|---|---|
+| original (what the lightbox used to load) | ~3.5 MB |
+| `c_limit` 2560 (now used) | ~550 KB |
+| `c_limit` 2048 | ~420 KB |
+| `c_limit` 1600 | ~280 KB |
+| thumbnail | ~30 KB |
 
-| Name (delivered as) | Definition | Allowed for strict |
-|---|---|---|
-| `feelings_large` (`t_feelings_large`) | `c_limit,w_1600,h_1600,f_auto,q_auto` | **yes** |
-| `feelings_thumb` (`t_feelings_thumb`) | `c_fill,g_auto,w_400,h_400,f_auto,q_auto` | **yes** |
+## 3. Rollout order
 
-Also mark the existing inline transformation `w_400,h_400,c_fill,g_auto,q_auto,f_auto` as
-**allowed for strict**. You can do this in Transformations → Transformation log, or the script does it.
+Credentials come from the environment in every step that needs them: `CLOUDINARY_URL`, or
+`CLOUDINARY_CLOUD_NAME` / `_API_KEY` / `_API_SECRET`.
 
-`c_limit` never upscales: the long side becomes min(original, 1600). The 1600 px limit is a trade-off,
-since a full-screen lightbox on a 2× display could use more. To change it, edit `large_max_px` *and*
-the named transformation together.
-
-## 3. Rollout order (console steps for Adam)
-
-1. Merge this branch to `master` and let the deploy finish. Check `/feelings/`: thumbnails load,
-   clicking opens the lightbox, and the image URL contains `t_feelings_large`.
-2. Set credentials in the environment and run `python scripts/cloudinary_setup_transforms.py --apply`.
-   It must end with "All set".
-3. Run `python scripts/cloudinary_check_delivery.py` to get a baseline. Each probe prints the status,
-   content type and size; note the size of `t_feelings_large` versus the original.
-4. Settings → Security → **Strict transformations: enable**. Run the checker again, with a new seed
-   so it probes photos nobody has viewed yet: `--seed 1`. Expected results:
-   - the site's thumbnail and `t_feelings_large` return 200;
-   - `w_401` is blocked;
-   - originals still return 200, because strict mode does not block originals.
-
-   Adding `adamjeisen.com` / `www.adamjeisen.com` to *Allowed strict referral domains* is **not
-   required** for the site, because everything it requests is pre-approved. Adding them would also let
-   anyone who spoofs that Referer generate arbitrary transformations, so leave the list empty unless
-   something breaks.
-5. Settings → Security → Restricted media types → **tick "Uploaded"**. Run the checker again with
-   another new seed (`--seed 2`). Expected: originals are blocked, and the site variants still return
-   200 both *with and without* a Referer.
-
-   **I could not confirm from Cloudinary's docs**, because cloudinary.com was unreachable from the
-   environment that made this change, whether restricting "Uploaded" also blocks *on-the-fly creation*
-   of derived images for not-yet-viewed photos. That is why step 5 uses a fresh seed. If the site
-   variants fail, untick "Uploaded" immediately. The fallback would be to pre-generate the derived
-   images with `explicit`/eager, which costs about 1 credit per 1,000 images, or to move to signed URLs.
-6. Restricted media types → also tick **Fetched URL**, and any other delivery types you don't use.
-   The site uses none of them.
+1. Sign the existing photos, then commit the updated `_data/feelings.json`:
+   ```bash
+   python scripts/cloudinary_sign_urls.py
+   ```
+   ```bash
+   python scripts/cloudinary_sign_urls.py --check
+   ```
+2. Merge to `master` and let the deploy finish. On `/feelings/`, check that thumbnails load, the
+   lightbox opens, and the image URLs contain `s--…--`.
+3. Run `python scripts/cloudinary_check_delivery.py` for a baseline. Every probe should return 200 at
+   this point.
+4. Console → Settings → Security → **Strict transformations: on**. Leave *Allowed strict referral
+   domains* empty; it isn't needed, because signed URLs pass. Run the checker with `--seed 1`.
+   Expected: the SITE rows return 200, `w_401` is blocked, and originals still return 200 (strict
+   mode doesn't cover originals).
+5. Restricted media types → **tick Uploaded** (and **Fetched URL**). Run the checker with `--seed 2`.
+   Expected: the SITE rows return 200 with and without a Referer; originals and unsigned thumbnails
+   are blocked. If any SITE row fails, untick "Uploaded" right away.
+6. Before every deploy, `cloudinary_sign_urls.py --check` must pass. The admin server signs new
+   uploads, but a failed signing logs a warning and leaves that photo unsigned, so it would be broken
+   on the site once "Uploaded" is restricted.
 
 Email to Cloudinary support (draft):
 
 > Hi, my free account (cloud `dpxqdgavv`) went over its credit limit because of crawler traffic, not
 > my site: about 95% of the last 30 days' bandwidth had a referrer of res.cloudinary.com or none, with
 > user agents like Reflectionbot and headless Chrome from Singapore datacenters. I've since switched
-> the site to named transformations, enabled strict transformations and restricted delivery of
-> originals. Could you give me a grace period past Nov 17 while the 30-day window rolls over? Could you
+> the site to signed, size-limited URLs, enabled strict transformations and restricted the upload
+> delivery type. Could you give me a grace period past Nov 17 while the 30-day window rolls over? Could you
 > also set up a referral-domain allowlist for adamjeisen.com on this account? Thanks, Adam
 
 ## 4. Daily usage report
 
-`scripts/cloudinary_usage.py`, which reads credentials from `CLOUDINARY_URL` or the
-`CLOUDINARY_CLOUD_NAME` / `_API_KEY` / `_API_SECRET` variables:
+`scripts/cloudinary_usage.py` (credentials from the environment, as above):
 
 ```bash
 python scripts/cloudinary_usage.py inspect
@@ -122,6 +126,7 @@ days cannot be recovered from the API. The script says so and reports the window
 Spike days are flagged when the value exceeds median + 3 × 1.4826 × MAD, a robust z-score above 3; set
 the multiplier with `--k`. The top 5 days are always listed. Output CSVs and raw JSON are git-ignored.
 
-Implementation note: the SDK puts the date into the request path. It encodes a `datetime.date` as
-`dd-mm-yyyy` (`/usage/05-10-2026`), but sends a string such as `"2026-10-05"` unchanged. The script
-therefore passes `date` objects.
+Date format: the official usage doc says `date` is `yyyy-mm-dd`. The Python SDK, however, encodes a
+`datetime.date` as `dd-mm-yyyy` (and sends a string unchanged). The script sends the documented form
+by default. `inspect --show <date>` prints the response for both forms, and `daily` refuses to run
+unless each response's `date_requested` echoes the requested date. Use `--date-form sdk` to switch.

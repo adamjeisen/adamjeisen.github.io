@@ -264,15 +264,15 @@ description: my attempts to visually and sonically capture my feelings & experie
       {% for photo in event.photos %}
       {% if photo.hidden %}{% continue %}{% endif %}
       {% comment %}
-        Never link the untransformed original: every request goes through an
-        approved transformation (see _config.yml `feelings_images` and
-        scripts/CLOUDINARY.md). The lightbox variant is bounded by
-        c_limit to large_max_px on its long side, so the PhotoSwipe
-        dimensions are scaled the same way (integer floor; Cloudinary may
-        round, a <=1px difference that only affects zoom limits).
+        Never link the untransformed original. Prefer the pre-computed signed URLs
+        (scripts/cloudinary_sign_urls.py); the unsigned fallback only works until
+        "Uploaded" is restricted in the Cloudinary console. The lightbox variant is
+        bounded by c_limit to large_max_px on its long side, so the PhotoSwipe
+        dimensions are scaled the same way (integer floor; Cloudinary may round,
+        a <=1px difference that only affects the zoom limit).
       {% endcomment %}
-      {% assign thumb_url = photo.url | replace: '/upload/', thumb_prefix %}
-      {% assign large_url = photo.url | replace: '/upload/', large_prefix %}
+      {% if photo.thumb_url %}{% assign thumb_url = photo.thumb_url %}{% else %}{% assign thumb_url = photo.url | replace: '/upload/', thumb_prefix %}{% endif %}
+      {% if photo.large_url %}{% assign large_url = photo.large_url %}{% else %}{% assign large_url = photo.url | replace: '/upload/', large_prefix %}{% endif %}
       {% if photo.width >= photo.height %}{% assign long_side = photo.width %}{% else %}{% assign long_side = photo.height %}{% endif %}
       {% if long_side > large_max_px %}
         {% assign large_w = photo.width | times: large_max_px | divided_by: long_side %}

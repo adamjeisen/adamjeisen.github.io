@@ -38,9 +38,12 @@ STEP 2 - daily report, once the semantics are confirmed:
                           console's own daily chart is the better source in that case.
 
 Notes:
-  * Dates are passed to the SDK as datetime.date objects; the SDK encodes them as
-    dd-mm-yyyy in the request path (/usage/<dd-mm-yyyy>). A raw "YYYY-MM-DD" string
-    would be sent unchanged, which is not the format the SDK uses.
+  * Date format: the official docs say `date` is "yyyy-mm-dd", but the Python SDK
+    encodes a datetime.date object as dd-mm-yyyy (and sends a string unchanged).
+    This script sends the documented "yyyy-mm-dd" string by default; `inspect --show`
+    prints the response for BOTH forms so you can see which one the API honours, and
+    `daily` refuses to run unless every response's date_requested echoes the date
+    that was asked for (--date-form sdk switches to the SDK's encoding).
   * GB here means 10^9 bytes. If the response has bandwidth.credits_usage, that is
     Cloudinary's own credit figure and is reported alongside.
   * One Admin API call per date (rate limit: 500/hour on the free plan).
@@ -64,9 +67,20 @@ GB = 1e9
 
 # ---------------------------------------------------------------- fetching ---
 
-def fetch(api, date: dt.date | None) -> dict:
-    resp = api.usage(date=date) if date is not None else api.usage()
-    return dict(resp)
+DATE_FORM = "iso"  # "iso": send "yyyy-mm-dd" (official docs); "sdk": send a date object (SDK -> dd-mm-yyyy)
+
+
+def fetch(api, date: dt.date | None, form: str | None = None) -> dict:
+    if date is None:
+        return dict(api.usage())
+    form = form or DATE_FORM
+    return dict(api.usage(date=date.isoformat() if form == "iso" else date))
+
+
+def echoes(date: dt.date, date_requested) -> bool:
+    """True if the response's date_requested refers to `date`."""
+    s = str(date_requested or "")
+    return s.startswith(date.isoformat()) or s.startswith(date.strftime("%d-%m-%Y"))
 
 
 def dates_back(days: int, end: dt.date) -> list[dt.date]:
@@ -101,8 +115,13 @@ def cmd_inspect(api, args) -> None:
     if args.show:
         for s in args.show:
             d = dt.date.fromisoformat(s)
-            print(f"===== usage(date={d.isoformat()}) -> request path /usage/{d.strftime('%d-%m-%Y')} =====")
-            print(json.dumps(fetch(api, d), indent=2, default=str))
+            for form, desc in (("iso", f'date="{d.isoformat()}" (documented form)'),
+                               ("sdk", f"date=datetime.date -> /usage/{d.strftime('%d-%m-%Y')}")):
+                print(f"===== usage({desc}) =====")
+                try:
+                    print(json.dumps(fetch(api, d, form), indent=2, default=str))
+                except Exception as e:  # show the API's answer verbatim
+                    print(f"ERROR: {e!r}")
         return
 
     end = dt.date.today() - dt.timedelta(days=1)
@@ -148,9 +167,7 @@ def cmd_inspect(api, args) -> None:
     print(f"latest per-date value ({dates[-1]})  : {bw[-1] / GB:10.3f} GB   (ratio to current {bw[-1] / c if c else float('nan'):.2f})")
     print(f"median per-date value                : {statistics.median(bw) / GB:10.3f} GB")
     print(f"day-over-day decreases               : {sum(x < 0 for x in diffs)} of {len(diffs)}")
-    mism = [(d, m["date_requested"]) for d, m in rows
-            if m["date_requested"] and d.isoformat() not in str(m["date_requested"])
-            and d.strftime("%d-%m-%Y") not in str(m["date_requested"])]
+    mism = [(d, m["date_requested"]) for d, m in rows if not echoes(d, m["date_requested"])]
     if mism:
         print(f"WARNING: date_requested does not echo the requested date for {len(mism)} calls, e.g. {mism[:3]}")
     print("\nInterpretation guide: SUM ~= current -> per_day; latest ~= current and values"
@@ -178,6 +195,9 @@ def cmd_daily(api, args) -> None:
     for d, m in ms:
         if m["bandwidth_bytes"] is None or m["requests"] is None:
             sys.exit(f"{d}: bandwidth.usage or requests missing from the response; run `inspect`.")
+        if not echoes(d, m["date_requested"]):
+            sys.exit(f"{d}: response date_requested={m['date_requested']!r} does not match the "
+                     "requested date, so the date was not honoured. Try --date-form sdk / check `inspect --show`.")
 
     out_rows = []
     if args.semantics == "per_day":
@@ -250,8 +270,13 @@ def main() -> None:
     pd.add_argument("--days", type=int, default=30)
     pd.add_argument("--out", default="cloudinary_daily_usage.csv")
     pd.add_argument("--k", type=float, default=3.0, help="spike threshold in robust SDs (default 3)")
+    for sp in (pi, pd):
+        sp.add_argument("--date-form", choices=["iso", "sdk"], default="iso",
+                        help='iso: send "yyyy-mm-dd" (documented, default); sdk: SDK date encoding (dd-mm-yyyy)')
 
     args = ap.parse_args()
+    global DATE_FORM
+    DATE_FORM = args.date_form
     configure_cloudinary()
     import cloudinary.api as api
 
