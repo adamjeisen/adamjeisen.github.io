@@ -1933,7 +1933,10 @@ function eventCardHtml(monthId, ev) {
 }
 
 function photoCardHtml(monthId, eventId, photo, idx, total) {
-  const thumb = photo.url.replace('/upload/', '/upload/w_280,h_220,c_fill/');
+  // Same approved transformation as the public site's grid (_config.yml
+  // feelings_images.thumb_transform), so it keeps working with Strict
+  // transformations on and never pulls the full-size original.
+  const thumb = photo.url.replace('/upload/', '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/');
   const dateStr = photo.date_taken ? `<span class="photo-date">${escHtml(photo.date_taken)}</span>` : '';
   const isHidden = photo.hidden;
   const hideLabel = isHidden ? 'Show' : 'Hide';
