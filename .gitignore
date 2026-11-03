@@ -15,3 +15,4 @@ vendor
 .env
 .venvcloudinary_daily_usage*.csv
 cloudinary_usage_raw*.json
+__pycache__/
