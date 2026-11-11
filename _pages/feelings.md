@@ -265,8 +265,8 @@ description: my attempts to visually and sonically capture my feelings & experie
       {% if photo.hidden %}{% continue %}{% endif %}
       {% comment %}
         Never link the untransformed original. Prefer the pre-computed signed URLs
-        (scripts/cloudinary_sign_urls.py); the unsigned fallback only works until
-        "Uploaded" is restricted in the Cloudinary console. The lightbox variant is
+        (scripts/cloudinary_sign_urls.py); with Strict transformations on, the unsigned
+        fallback only works for images Cloudinary has already generated. The lightbox variant is
         bounded by c_limit to large_max_px on its long side, so the PhotoSwipe
         dimensions are scaled the same way (integer floor; Cloudinary may round,
         a <=1px difference that only affects the zoom limit).

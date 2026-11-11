@@ -1944,7 +1944,7 @@ function eventCardHtml(monthId, ev) {
 
 function photoCardHtml(monthId, eventId, photo, idx, total) {
   // Signed thumbnail (same as the public grid), so it keeps working with Strict
-  // transformations / restricted "Uploaded" and never pulls the full-size original.
+  // transformations (on) and never pulls the full-size original.
   // Unsigned fallback only for photos not yet signed (scripts/cloudinary_sign_urls.py).
   const thumb = photo.thumb_url || photo.url.replace('/upload/', '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/');
   const dateStr = photo.date_taken ? `<span class="photo-date">${escHtml(photo.date_taken)}</span>` : '';
