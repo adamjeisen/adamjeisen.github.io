@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Store signed thumbnail + lightbox URLs for every /feelings/ photo.
 
-Why: with "Uploaded" ticked under Restricted media types, Cloudinary only delivers
-/image/upload/ URLs that are signed (or pre-generated eagerly). Signed URLs also pass
-Strict transformations, so no transformation needs to be allow-listed. The signature
+Why: with Strict transformations on (and "Uploaded" restricted), Cloudinary only
+*creates* derived images from signed URLs (or eager/API generation), so no
+transformation needs to be allow-listed. The signature
 is computed with the API secret, but the signature itself is not secret: it is
 safe to commit and publish (it only authorises that exact transformation of that image).
 
@@ -15,8 +15,8 @@ transformation strings in _config.yml (feelings_images). Re-run after changing t
 strings. New uploads through scripts/admin_server.py are signed automatically.
 
 --check exits non-zero if any photo (hidden ones included) has a missing signed URL
-or one built from a transformation that no longer matches _config.yml. Do not tick
-"Uploaded" in the Cloudinary console until --check passes on the deployed data.
+or one built from a transformation that no longer matches _config.yml. It must pass
+before every deploy: an unsigned photo's images can't be generated under Strict mode.
 """
 
 from __future__ import annotations

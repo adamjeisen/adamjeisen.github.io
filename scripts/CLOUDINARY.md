@@ -28,14 +28,40 @@ matches the observed ~720 KB/request.
 **Every image URL on the page is now a signed, transformed URL.** The untransformed original is never
 requested.
 
-Cloudinary's docs settled the design. On *Restricted media types* the security FAQ
-(`developer_onboarding_faq_account_security`) says: "if you select any of these features or delivery
-types, then those types of URLs can be delivered only as signed URLs or if they are pre-generated as
-eager transformations." Ticking **Uploaded** therefore blocks *every* unsigned `/image/upload/` URL,
-thumbnails and lightbox images included, not just originals. Marking transformations "allowed for
-strict" is not enough to survive that setting. Signed URLs satisfy both Strict transformations and
-the restricted "Uploaded" type. (Named transformations were dropped: they add nothing once URLs are
-signed, and the docs say `f_auto` can't be used inside a named transformation.)
+Signed URLs were chosen because they pass every security setting Cloudinary offers: Strict
+transformations, and restricted media types such as "Uploaded". (Named transformations were dropped:
+they add nothing once URLs are signed, and the docs say `f_auto` can't be used inside a named
+transformation.)
+
+**What the console settings actually do (measured on this account, 2026-11-11).** The design first
+assumed, from the security FAQ, that ticking **Uploaded** blocks *every* unsigned `/image/upload/`
+URL, originals included. That is **wrong**. After it was ticked and saved, originals and unsigned
+thumbnails that had already been generated still returned 200, on CDN cache misses (`server-timing`
+`desc=miss`), so the answer came from Cloudinary itself. They were still 200 ten minutes later. The
+console's own description matches this: restricted types are "restricted from use with dynamic URLs.
+Images of restricted services can only be *created* explicitly using the authenticated API or signed
+URLs." In practice:
+
+| Request | Strict transformations on | + "Uploaded" restricted |
+|---|---|---|
+| Signed URL (site `thumb_url` / `large_url`) | 200 | 200 |
+| Signed URL, transformation never generated before | 200 (created) | 200 (created) |
+| Fake signature, transformation never generated before | 401 | 401 |
+| Unsigned transformation never generated before (e.g. `w_401`) | 401 | 401 |
+| Unsigned transformation that already exists (e.g. old unsigned thumbnails) | 200 | 200 |
+| **Untransformed original** `/image/upload/v…/<id>.jpg` | **200** | **200** |
+
+So the current setup stops anyone **creating** new images (no transformation-quota abuse) and the
+site no longer links to originals. It does **not** stop anyone who already has an original's URL
+from downloading it at full size. Crawlers had harvested those URLs; that was the bandwidth problem.
+
+Blocking originals would mean moving the photos to the **`private`** delivery type, where originals
+need a signed URL. That needs a type change on all 4,134 assets, re-signing every URL for the new
+type, a redeploy, and making the admin server upload as `private`. It probably also means
+regenerating the derived images, roughly 4.1k transformations (~4.1 credits) for thumbnails plus
+more for lightbox images as they are opened (an estimate). The exact API call and whether derived
+images carry over are unverified; test on one photo first. **Decision (2026-11-11): not doing this
+now.** Watch usage instead (§5) and convert only if bandwidth on originals climbs again.
 
 - `_config.yml` → `feelings_images` (the single source of truth):
   - `thumb_transform: w_400,h_400,c_fill,g_auto,q_auto,f_auto`. This is the grid thumbnail. It is the
@@ -49,7 +75,8 @@ signed, and the docs say `f_auto` can't be used inside a named transformation.)
   itself is not secret. It authorises only that exact transformation of that image, so it is safe to
   commit and publish. Changing a transformation string means re-running the script.
 - `_pages/feelings.md`: uses the signed URLs. It falls back to unsigned transformed URLs for unsigned
-  photos, which only works until "Uploaded" is restricted. The page was checked by rendering it with
+  photos. With Strict transformations on, that fallback only works if the image was already generated,
+  so `--check` must pass before every deploy. The page was checked by rendering it with
   Liquid 4.0.4: 8,250 Cloudinary URLs, 0 originals, all lightbox dimensions correct, both with signed
   data and with unsigned fallback data.
 - `scripts/admin_server.py`: new uploads are signed automatically. Admin thumbnails use the signed URL.
@@ -89,19 +116,25 @@ Credentials come from the environment in every step that needs them: `CLOUDINARY
    domains* empty; it isn't needed, because signed URLs pass. Run the checker with `--seed 1`.
    Expected: the SITE rows return 200, `w_401` is blocked, and originals still return 200 (strict
    mode doesn't cover originals).
-5. Restricted media types → **tick Uploaded** (and **Fetched URL**). Run the checker with `--seed 2`.
-   Expected: the SITE rows return 200 with and without a Referer; originals and unsigned thumbnails
-   are blocked. If any SITE row fails, untick "Uploaded" right away.
+5. Restricted image types → **tick Uploaded** (and **Fetched URL**). Run the checker with `--seed 2`.
+   Expected, as measured: the SITE rows return 200 with and without a Referer, and `w_401` stays
+   blocked. Originals and existing unsigned thumbnails **still return 200**: this setting does not block
+   them (see §2). Ticking it is harmless and blocks *creating* images from unsigned URLs, which Strict
+   transformations already does. If any SITE row fails, untick "Uploaded" right away.
+
+   Status (2026-11-11): steps 1–5 done. Strict on; Uploaded and Fetched URL ticked; all SITE probes 200;
+   a fake signature on a never-generated transformation returned 401 and the real signature 200.
 6. Retiring the API key that signed the URLs: Cloudinary's docs don't say whether signed delivery URLs
    are checked against any active key's secret or only one key's secret (unverified). Before deleting
    the key that was used for signing, **deactivate** it in the console, then run the checker with a new
    `--seed`. If the SITE rows still return 200, delete the key. If they fail, reactivate the key and
    re-sign with a key you will keep.
 7. Before every deploy, `cloudinary_sign_urls.py --check` must pass. The admin server signs new
-   uploads, but a failed signing logs a warning and leaves that photo unsigned, so it would be broken
-   on the site once "Uploaded" is restricted.
+   uploads, but a failed signing logs a warning and leaves that photo unsigned. With Strict
+   transformations on, an unsigned new photo's thumbnail and lightbox image can't be generated, so
+   that photo would be broken on the site.
 
-Email to Cloudinary support (draft):
+Email to Cloudinary support (sent via the support portal on 2026-11-11, based on this draft):
 
 > Hi, my free account (cloud `dpxqdgavv`) went over its credit limit because of crawler traffic, not
 > my site: about 95% of the last 30 days' bandwidth had a referrer of res.cloudinary.com or none, with
@@ -122,8 +155,14 @@ python scripts/cloudinary_usage.py inspect
 python scripts/cloudinary_usage.py daily --semantics per_day --out cloudinary_daily_usage.csv
 ```
 
-What a per-date `usage(date=…)` call returns (that day only, cumulative, or a rolling 30-day total) is
-**unverified**. `inspect` dumps the raw responses and prints a diagnostic (the sum of the per-date
+**Confirmed 2026-11-11: a per-date `usage(date=…)` call returns that day's usage (`per_day`).**
+The 30 per-date bandwidth values (2026-10-12 … 11-10) summed to 22.11 GiB, against a current total of
+22.40 GiB (ratio 0.99). The latest single day was 0.056 GB, so it isn't a rolling 30-day total, and 15 of
+29 days were lower than the day before, so it isn't cumulative. Each `date_requested` echoed the
+requested `yyyy-mm-dd` date. Also confirmed: bandwidth credits = bytes / 2^30 (GiB), and
+`credits.usage` = bandwidth + storage + transformations credits (22.40 + 11.92 + 1.18 = 35.50).
+
+How this was established: `inspect` dumps the raw responses and prints a diagnostic (the sum of the per-date
 values versus the current total). `daily` refuses to run without an explicit `--semantics`, so no daily
 numbers are reported until you have confirmed which it is. If it turns out to be `rolling30`, single
 days cannot be recovered from the API. The script says so and reports the window's net change instead.
@@ -135,3 +174,31 @@ Date format: the official usage doc says `date` is `yyyy-mm-dd`. The Python SDK,
 `datetime.date` as `dd-mm-yyyy` (and sends a string unchanged). The script sends the documented form
 by default. `inspect --show <date>` prints the response for both forms, and `daily` refuses to run
 unless each response's `date_requested` echoes the requested date. Use `--date-form sdk` to switch.
+
+## 5. Watching for a return of crawler traffic
+
+Because originals can still be downloaded by anyone who has their URL (§2), watch daily bandwidth.
+Credentials are needed:
+
+```bash
+python scripts/cloudinary_usage.py daily --semantics per_day --days 14 --out cloudinary_daily_usage.csv
+```
+
+Reference points (2026-10-12 … 11-10, after the site stopped linking originals on 11-11, so future
+site traffic should be lower than this):
+
+- typical day: median 0.23 GB;
+- spike days were 1.0–6.8 GB (Oct 13–14, Nov 2–7). Together those 8 days were 82% of the window's bandwidth;
+- after the crawlers stopped: 0.01 GB/day (Nov 8–9) and 0.06 GB (Nov 10).
+
+**Trigger for converting to `private` (§2):** any day above ~0.8 GB (the script's spike threshold for
+that window was 0.78 GB), or several days in a row well above the post-Nov-11 baseline. The usage
+API doesn't break bandwidth down by URL. To confirm the traffic is for originals, check the
+Cloudinary console's reports, if the plan includes them, or probe whether the spike matches harvested
+`/image/upload/v…` URLs. Prefer converting after the 30-day window has recovered, because the
+conversion itself costs transformation credits.
+
+Projection, not a measurement: with near-zero bandwidth from 11-11 on, usage first drops below 100%
+around 2026-11-27, or around 12-04 at 0.23 GB/day. This assumes the 30-day window ends the day before
+and that storage (11.92 credits) and transformations (1.18) stay flat. The Nov 2–7 spike leaves the
+window in early December.

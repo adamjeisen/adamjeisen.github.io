@@ -27,7 +27,7 @@ back_to_top: true # set to false to disable the back to top button
 # The page never requests an untransformed original. Each photo in _data/feelings.json
 # carries pre-computed *signed* URLs (thumb_url, large_url) built from these strings by
 # scripts/cloudinary_sign_urls.py. Signed URLs keep working with Strict transformations
-# and with "Uploaded" restricted. After changing any value here, re-run that script.
+# and with "Uploaded" restricted (both are on). After changing any value here, re-run that script.
 #   thumb_transform: grid thumbnail; identical to the string used since the start, so
 #     the thumbnails Cloudinary has already generated are reused.
 #   large_transform: lightbox / click-through image. c_limit never upscales.

@@ -5,7 +5,10 @@ Needs no credentials. Run it BEFORE and AFTER each console security change
 (Strict transformations, then Restricted media type "Uploaded") to confirm:
   * the site's signed URLs (thumb_url / large_url in _data/feelings.json) return 200,
     with and without a Referer;
-  * originals and unsigned transformations are blocked once the settings are on.
+  * new unsigned transformations (w_401) are blocked once Strict is on.
+Measured 2026-11-11: originals and already-generated unsigned thumbnails stay 200 even
+with "Uploaded" restricted (that setting only blocks *creating* images from unsigned
+URLs). Those rows are reported for information; see scripts/CLOUDINARY.md section 2.
 
     python scripts/cloudinary_check_delivery.py               # 3 random photos
     python scripts/cloudinary_check_delivery.py --seed 7      # a different 3
@@ -59,8 +62,8 @@ def main() -> None:
         probes = {
             "SITE signed thumb_url        (must be 200)": p.get("thumb_url"),
             "SITE signed large_url        (must be 200)": p.get("large_url"),
-            "original                     (blocked once 'Uploaded' restricted)": url,
-            "unsigned thumb               (blocked once 'Uploaded' restricted)":
+            "original                     (info: stays 200, see CLOUDINARY.md)": url,
+            "unsigned thumb (exists)      (info: stays 200, see CLOUDINARY.md)":
                 url.replace("/upload/", f"/upload/{fi['thumb_transform']}/", 1),
             "unsigned w_401               (blocked once Strict is on)":
                 url.replace("/upload/", "/upload/w_401/", 1),
