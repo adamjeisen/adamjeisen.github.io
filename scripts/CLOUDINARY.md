@@ -92,7 +92,12 @@ Credentials come from the environment in every step that needs them: `CLOUDINARY
 5. Restricted media types → **tick Uploaded** (and **Fetched URL**). Run the checker with `--seed 2`.
    Expected: the SITE rows return 200 with and without a Referer; originals and unsigned thumbnails
    are blocked. If any SITE row fails, untick "Uploaded" right away.
-6. Before every deploy, `cloudinary_sign_urls.py --check` must pass. The admin server signs new
+6. Retiring the API key that signed the URLs: Cloudinary's docs don't say whether signed delivery URLs
+   are checked against any active key's secret or only one key's secret (unverified). Before deleting
+   the key that was used for signing, **deactivate** it in the console, then run the checker with a new
+   `--seed`. If the SITE rows still return 200, delete the key. If they fail, reactivate the key and
+   re-sign with a key you will keep.
+7. Before every deploy, `cloudinary_sign_urls.py --check` must pass. The admin server signs new
    uploads, but a failed signing logs a warning and leaves that photo unsigned, so it would be broken
    on the site once "Uploaded" is restricted.
 
