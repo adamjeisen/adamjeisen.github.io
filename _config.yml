@@ -23,6 +23,21 @@ last_updated: false # set to true if you want to display last updated in the foo
 impressum_path: # set to path to include impressum link in the footer, use the same path as permalink in a page, helps to conform with EU GDPR
 back_to_top: true # set to false to disable the back to top button
 
+# Cloudinary delivery for /feelings/ (see scripts/CLOUDINARY.md).
+# The page never requests an untransformed original. Each photo in _data/feelings.json
+# carries pre-computed *signed* URLs (thumb_url, large_url) built from these strings by
+# scripts/cloudinary_sign_urls.py. Signed URLs keep working with Strict transformations
+# and with "Uploaded" restricted. After changing any value here, re-run that script.
+#   thumb_transform: grid thumbnail; identical to the string used since the start, so
+#     the thumbnails Cloudinary has already generated are reused.
+#   large_transform: lightbox / click-through image. c_limit never upscales.
+#   large_max_px MUST equal the w_/h_ limit in large_transform (the scripts check this);
+#     the page uses it to compute the lightbox dimensions passed to PhotoSwipe.
+feelings_images:
+  thumb_transform: w_400,h_400,c_fill,g_auto,q_auto,f_auto
+  large_transform: c_limit,w_2560,h_2560,q_auto,f_auto
+  large_max_px: 2560
+
 # -----------------------------------------------------------------------------
 # Theme
 # -----------------------------------------------------------------------------
@@ -192,6 +207,10 @@ exclude:
   - README.md
   - readme_preview/
   - vendor
+  - scripts/
+  - pyproject.toml
+  - uv.lock
+  - requirements.txt
 keep_files:
   - CNAME
   - .nojekyll

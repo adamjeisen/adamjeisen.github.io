@@ -211,6 +211,10 @@ description: my attempts to visually and sonically capture my feelings & experie
 }
 </style>
 
+{% assign thumb_prefix = '/upload/' | append: site.feelings_images.thumb_transform | append: '/' %}
+{% assign large_prefix = '/upload/' | append: site.feelings_images.large_transform | append: '/' %}
+{% assign large_max_px = site.feelings_images.large_max_px | plus: 0 %}
+
 {% assign total_photos = 0 %}
 {% for month in site.data.feelings %}
   {% for event in month.events %}
@@ -259,10 +263,27 @@ description: my attempts to visually and sonically capture my feelings & experie
     <div class="tis-photo-grid">
       {% for photo in event.photos %}
       {% if photo.hidden %}{% continue %}{% endif %}
-      {% assign thumb_url = photo.url | replace: '/upload/', '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/' %}
-      <a href="{{ photo.url }}"
-         data-pswp-width="{{ photo.width }}"
-         data-pswp-height="{{ photo.height }}"
+      {% comment %}
+        Never link the untransformed original. Prefer the pre-computed signed URLs
+        (scripts/cloudinary_sign_urls.py); the unsigned fallback only works until
+        "Uploaded" is restricted in the Cloudinary console. The lightbox variant is
+        bounded by c_limit to large_max_px on its long side, so the PhotoSwipe
+        dimensions are scaled the same way (integer floor; Cloudinary may round,
+        a <=1px difference that only affects the zoom limit).
+      {% endcomment %}
+      {% if photo.thumb_url %}{% assign thumb_url = photo.thumb_url %}{% else %}{% assign thumb_url = photo.url | replace: '/upload/', thumb_prefix %}{% endif %}
+      {% if photo.large_url %}{% assign large_url = photo.large_url %}{% else %}{% assign large_url = photo.url | replace: '/upload/', large_prefix %}{% endif %}
+      {% if photo.width >= photo.height %}{% assign long_side = photo.width %}{% else %}{% assign long_side = photo.height %}{% endif %}
+      {% if long_side > large_max_px %}
+        {% assign large_w = photo.width | times: large_max_px | divided_by: long_side %}
+        {% assign large_h = photo.height | times: large_max_px | divided_by: long_side %}
+      {% else %}
+        {% assign large_w = photo.width %}
+        {% assign large_h = photo.height %}
+      {% endif %}
+      <a href="{{ large_url }}"
+         data-pswp-width="{{ large_w }}"
+         data-pswp-height="{{ large_h }}"
          data-event-title="{{ event.title }}"
          data-caption="{{ photo.caption }}"
          class="tis-photo-item tis-{{ photo.orientation }}"

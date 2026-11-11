@@ -27,6 +27,9 @@ import cloudinary
 import cloudinary.api
 import cloudinary.uploader
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cloudinary_common import feelings_image_config, signed_photo_urls  # noqa: E402
+
 from admin_helpers import (
     parse_markdown, serialize_markdown, read_markdown_file, write_markdown_file,
     list_markdown_dir, read_yaml, write_yaml, read_yaml_with_comments,
@@ -885,8 +888,15 @@ def tis_upload_photo(month_id, event_id):
             date_taken = meta[key]
             break
 
+    try:
+        signed = signed_photo_urls(result["secure_url"], feelings_image_config())
+    except (Exception, SystemExit) as e:  # never lose an upload over this; --check flags it
+        print(f"Warning: could not sign URLs for {result['secure_url']}: {e}")
+        signed = {}
+
     photo = {
         "url": result["secure_url"],
+        **signed,
         "caption": caption,
         "width": width,
         "height": height,
@@ -1933,7 +1943,10 @@ function eventCardHtml(monthId, ev) {
 }
 
 function photoCardHtml(monthId, eventId, photo, idx, total) {
-  const thumb = photo.url.replace('/upload/', '/upload/w_280,h_220,c_fill/');
+  // Signed thumbnail (same as the public grid), so it keeps working with Strict
+  // transformations / restricted "Uploaded" and never pulls the full-size original.
+  // Unsigned fallback only for photos not yet signed (scripts/cloudinary_sign_urls.py).
+  const thumb = photo.thumb_url || photo.url.replace('/upload/', '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/');
   const dateStr = photo.date_taken ? `<span class="photo-date">${escHtml(photo.date_taken)}</span>` : '';
   const isHidden = photo.hidden;
   const hideLabel = isHidden ? 'Show' : 'Hide';
